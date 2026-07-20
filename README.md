@@ -1,8 +1,31 @@
 # gzh-to-ima-skill
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/canyexuanfan/gzh-to-ima-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/canyexuanfan/gzh-to-ima-skill/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org)
+[![Node](https://img.shields.io/badge/node-18%2B-green.svg)](https://nodejs.org)
+
 把**微信公众号文章**批量抓取并导入到 **IMA 知识库**的自动化技能（skill）。
 
 > 给一个公众号文章链接 → 脚本抓取该号全部历史文章（去重）→ 用 IMA OpenAPI 把文章 URL 批量导入指定知识库/文件夹。
+
+**Batch-import WeChat official account articles into an IMA knowledge base** — fetch via `__biz`, dedupe, then `import_urls` through the IMA OpenAPI.
+
+---
+
+## 目录
+
+- [功能](#功能)
+- [架构](#架构)
+- [目录结构](#目录结构)
+- [环境要求](#环境要求)
+- [安装](#安装)
+- [配置凭证](#配置凭证)
+- [使用](#使用)
+- [频控警告](#频控警告非常重要)
+- [安全 / 脱敏说明](#安全--脱敏说明)
+- [贡献](#贡献)
+- [License](#license)
 
 ---
 
@@ -161,7 +184,7 @@ node ../ima-skill/ima_api.cjs 'openapi/wiki/v1/import_urls' \
 
 ---
 
-## ⚠️ 频控警告（非常重要）
+## 频控警告（非常重要）
 
 微信文章列表接口有严格频控：
 
@@ -184,6 +207,18 @@ node ../ima-skill/ima_api.cjs 'openapi/wiki/v1/import_urls' \
 
 ---
 
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+提交前请确保：
+- 不提交任何私人凭证（`weixin_credentials.py` 已被 `.gitignore` 排除）；
+- 通过 CI 的敏感信息扫描（见 [CONTRIBUTING.md](CONTRIBUTING.md) 自检查骤）。
+
+---
+
 ## License
 
-MIT
+[MIT License](LICENSE) © 2026 canyexuanfan
+
+详见 [LICENSE](LICENSE) 文件。
