@@ -32,9 +32,10 @@ jobs:
           find . \( -name "*.cjs" -o -name "*.js" \) -not -path "./.git/*" -print0 | xargs -0 -n1 node --check
 
       - name: Secret leak scan
-        # 防御：任何真实微信 cookie / 云密钥特征泄漏即失败
+        # 防御：检查实际代码目录是否误提交真实微信凭证 / 云密钥
+        # 只扫描 wechat-to-ima/ 与 ima-skill/，避免把 CI 文件和文档里的示例 grep 命令误当成泄露
         run: |
-          if grep -rIin -E "wxuin=|slave_sid=|bizuin=|AKID[A-Za-z0-9]{10,}|token=15[0-9]{8}" . --exclude-dir=.git; then
+          if grep -rIin -E "wxuin=|slave_sid=|bizuin=|AKID[A-Za-z0-9]{10,}|token=15[0-9]{8}" wechat-to-ima ima-skill; then
             echo "::error::检测到疑似私人凭证泄漏，已阻止。请检查改动。"
             exit 1
           fi

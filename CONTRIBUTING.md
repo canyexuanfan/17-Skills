@@ -21,9 +21,9 @@
 - 脚本中涉及具体公众号的 `biz` / 名称 / 绝对路径，请使用示例占位符（如 `YOUR_BIZ_HERE` / `示例公众号` / 相对路径）。
 - 提交前本地跑一次敏感词自检：
   ```bash
-  grep -rIin "wxuin=\|slave_sid=\|bizuin=\|AKID\|token=15" . --exclude-dir=.git
+  grep -rIin -E "wxuin=|slave_sid=|bizuin=|AKID[A-Za-z0-9]{10,}|token=15[0-9]{8}" wechat-to-ima ima-skill
   ```
-  应为空。CI 也会自动扫描，命中会报错拦截。
+  应为空。CI 也会自动扫描这两个代码目录，命中会报错拦截。
 
 ### 3. 频控铁律（涉及抓取逻辑时）
 - 微信文章列表接口 `ret=200013` / `ret=200003` = 频率控制，会封 IP。任何抓取改动都必须保留「间隔 + 立即停 / 退避」机制，**不得为了速度牺牲频控安全**。
