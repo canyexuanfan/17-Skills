@@ -209,7 +209,9 @@ node ../ima-skill/ima_api.cjs 'openapi/wiki/v1/import_urls' \
 
 ## 贡献
 
-欢迎提交 Issue 和 Pull Request！请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎提交 Issue 和 Pull Request！请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [行为准则](CODE_OF_CONDUCT.md)。
+
+> 提 Bug / 功能请求时，请使用仓库预设的 Issue 模板，信息更完整、处理更快。
 
 提交前请确保：
 - 不提交任何私人凭证（`weixin_credentials.py` 已被 `.gitignore` 排除）；
