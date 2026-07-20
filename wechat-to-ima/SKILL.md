@@ -69,17 +69,27 @@ node "../ima-skill/ima_api.cjs" ^
 
 ### Step 3：批量导入 URL（每批 10 个，间隔 0.5 秒）
 
-读取 Step 1 的 JSON，提取所有 `link`，每 10 个一批调用 `import_urls`：
+使用 `batch_import_to_ima.py` 批量导入：
 
 ```bash
-node "../ima-skill/ima_api.cjs" ^
-  'openapi/wiki/v1/import_urls' ^
-  '{"knowledge_base_id":"kb_id","folder_id":"folder_id","urls":["url1","url2",...]}'
+# 搜索知识库
+python "batch_import_to_ima.py" --search "知识库名称"
+
+# 列出知识库内容（查 folder_id）
+python "batch_import_to_ima.py" --list "知识库ID"
+
+# 批量导入到指定文件夹
+python "batch_import_to_ima.py" \
+  --import-json "公众号_全部文章_YYYYMMDD.json" \
+  --kb-id "知识库ID" --folder-id "文件夹ID"
+
+# 导入到根目录（folder-id 留空）
+python "batch_import_to_ima.py" \
+  --import-json "公众号_全部文章_YYYYMMDD.json" \
+  --kb-id "知识库ID"
 ```
 
-- 导入到根目录：`folder_id` 留空字符串 `""`
-- 每批之间 `sleep 0.5`
-- **Agent 应写一个小脚本**（Python/Node）批量读取 JSON 并循环调用 `import_urls`，避免手动拼 URL 出错
+脚本自动管理批处理、间隔、进度报告，无需手动拼 URL。
 
 ### Step 4：汇报
 

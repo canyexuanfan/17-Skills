@@ -202,6 +202,10 @@ def main():
     p.add_argument("--seed-offset", type=int, default=None, help="手动指定起始 offset")
     p.add_argument("--retry", type=int, default=0, help="频控自动重试次数")
     p.add_argument("--retry-wait", type=int, default=600, help="频控重试前等待秒数")
+    p.add_argument("--save-master", default=None, help="同时保存到 master JSON（去重基准，后续供 resume 使用）")
+    p.add_argument("--auto-import", action="store_true", help="抓取完成后自动调用 batch_import_to_ima.py 导入 IMA")
+    p.add_argument("--kb-id", default=None, help="目标 IMA 知识库 ID（配合 --auto-import）")
+    p.add_argument("--folder-id", default="", help="目标 IMA 文件夹 ID（配合 --auto-import）")
     args = p.parse_args()
 
     token = args.token or DEFAULT_TOKEN
@@ -277,6 +281,36 @@ def main():
 
     save_state(end_offset, 0, 0)
     log(f"✅ 本次新增 {len(articles)} 篇，合并后共 {len(merged)} 篇 -> {out_path}")
+
+    # 可选：保存到 master JSON（供 resume_crawl 用作去重基准）
+    if args.save_master:
+        with open(args.save_master, "w", encoding="utf-8") as f:
+            json.dump(merged, f, ensure_ascii=False, indent=2)
+        log(f"💾 同时保存到 master: {args.save_master}")
+
+    # 可选：自动导入 IMA
+    if args.auto_import:
+        if not args.kb_id:
+            log("❌ --auto-import 需要同时指定 --kb-id")
+        elif not merged:
+            log("ℹ️ 无文章可导入")
+        else:
+            log(f"📥 开始自动导入 {len(merged)} 篇文章到 IMA 知识库...")
+            batch_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "batch_import_to_ima.py")
+            if os.path.exists(batch_script):
+                import subprocess as _sp
+                cmd = [sys.executable, batch_script,
+                       "--import-json", out_path,
+                       "--kb-id", args.kb_id]
+                if args.folder_id:
+                    cmd += ["--folder-id", args.folder_id]
+                result = _sp.run(cmd, capture_output=True, text=True, timeout=600)
+                for line in result.stdout.strip().split("\n"):
+                    log(line)
+                if result.returncode != 0:
+                    log(f"⚠️ 自动导入进程返回 {result.returncode}")
+            else:
+                log(f"❌ 找不到 batch_import_to_ima.py，请确认文件在同目录下")
 
 
 if __name__ == "__main__":

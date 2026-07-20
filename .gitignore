@@ -3,6 +3,9 @@ weixin_credentials.py          # 含真实微信 token / cookie
 resume_state.json              # 断点续抓状态
 delivered_links.json           # 已交付链接记录
 master_articles.json           # 抓取生成的全量文章基准
+*_全部文章_*.json              # 全量文章 JSON 输出
+*公众号_新增文章链接_*.md       # 增量交付文档
+last_update_check             # IMA skill 更新检查记录
 
 # ===== Python =====
 __pycache__/

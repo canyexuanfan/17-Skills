@@ -35,6 +35,8 @@
 - 🔁 **断点续抓**：支持从断点 `offset` 继续，不重抓已抓过的文章；频控触发会自动退避重试。
 - 📄 **增量交付**：对比已交付记录，只输出「本次新增且从未发过」的文章清单（Markdown）。
 - 📥 **导入 IMA**：通过 IMA OpenAPI `import_urls` 把文章 URL 批量灌入知识库，每批 10 条。
+- 🚀 **一键全自动**：`--auto-import` 参数让抓取完成后自动导入 IMA 知识库。
+- 🎯 **CLI 驱动**：所有脚本都通过命令行参数控制，无需手动编辑代码文件。
 
 ---
 
@@ -70,11 +72,12 @@ gzh-to-ima-skill/
 ├── .gitignore
 ├── wechat-to-ima/                 # 主技能：抓取 + 交付
 │   ├── SKILL.md                   # 技能说明（Agent 读取）
-│   ├── fetch_articles.py          # 全量抓取（仅标准库，无需 pip install）
-│   ├── parse_cookie.py            # 把浏览器 Copy All 的 Cookie 转成请求头字符串
-│   ├── resume_crawl.py            # 断点续抓 + 增量交付
-│   └── weixin_credentials.example.py  # 微信凭证模板（复制为 weixin_credentials.py 后填）
-└── ima-skill/                     # 依赖：IMA OpenAPI 客户端（原样附带）
+│   ├── fetch_articles.py              # 全量抓取（仅标准库，无需 pip install）
+│   ├── parse_cookie.py                # 把浏览器 Copy All 的 Cookie 转成请求头字符串
+│   ├── resume_crawl.py                # 断点续抓 + 增量交付（支持 CLI 参数，无需改文件）
+│   ├── batch_import_to_ima.py         # 批量导入 JSON 文章到 IMA 知识库
+│   └── weixin_credentials.example.py  # 微信凭证模板（复制后填）
+└── ima-skill/                         # 依赖：IMA OpenAPI 客户端（原样附带）
     ├── SKILL.md
     ├── ima_api.cjs
     ├── meta.json
@@ -89,13 +92,13 @@ gzh-to-ima-skill/
 | 依赖 | 版本 | 说明 |
 |------|------|------|
 | Python | 3.8+ | 仅用标准库（`urllib`/`re`/`json`），**无需 pip install** |
-| Node.js | 18+ | 运行 `ima_api.cjs` |
+| Node.js | 18+ | 运行 `ima_api.cjs`（仅导入 IMA 时需要） |
 
 ---
 
 ## 安装
 
-把两个目录放进你的 WorkBuddy 技能目录（或任意目录，调用时写对路径即可）：
+把两个目录放进你的技能目录（Hermes Agent / WorkBuddy 或其他 Agent 均可）：
 
 ```bash
 # 放到 WorkBuddy 用户级技能目录（示例）
@@ -156,31 +159,57 @@ python fetch_articles.py \
 
 ### Step 2（可选）：断点续抓 + 增量交付
 
-编辑 `resume_crawl.py` 顶部三项（`MASTER` / `NAME` / `BIZ`）指向你的目标公众号，然后：
-
 ```bash
-python resume_crawl.py
+cd wechat-to-ima
+python resume_crawl.py --biz "公众号__biz" --name "公众号名称"
 ```
 
-脚本从断点续抓，把「本次新增且从未发过」的文章生成一份 Markdown 文档（路径以 `DELIVER_DOC:` 开头打印）。
-
-### Step 3：导入 IMA 知识库
-
-先查知识库 ID 和文件夹 ID：
+支持 CLI 参数控制，无需编辑脚本文件。更多选项：
 
 ```bash
-node ../ima-skill/ima_api.cjs 'openapi/wiki/v1/search_knowledge_base' '{"query":"知识库名称","cursor":"","limit":10}'
-node ../ima-skill/ima_api.cjs 'openapi/wiki/v1/get_knowledge_list' '{"knowledge_base_id":"kb_id","cursor":"","limit":50}'
+# 指定 master 和已交付记录路径
+python resume_crawl.py --biz "公众号__biz" --name "公众号名" \\
+    --master "./master.json" --delivered "./delivered.json"
+
+# 续抓后自动导入 IMA
+python resume_crawl.py --biz "公众号__biz" --name "公众号名" \\
+    --import-ima --kb-id "知识库ID"
 ```
 
-拿到 `knowledge_base_id` 和 `folder_id` 后，每 10 条一批导入：
+### Step 3：批量导入 IMA 知识库
 
 ```bash
-node ../ima-skill/ima_api.cjs 'openapi/wiki/v1/import_urls' \
-  '{"knowledge_base_id":"kb_id","folder_id":"folder_id","urls":["url1","url2",...]}'
+cd wechat-to-ima
+
+# 先搜索知识库 ID
+python batch_import_to_ima.py --search "知识库名称"
+
+# 列出知识库内容（查文件夹 ID）
+python batch_import_to_ima.py --list "知识库ID"
+
+# 批量导入到指定文件夹
+python batch_import_to_ima.py --import-json "公众号_全部文章_YYYYMMDD.json" \\
+    --kb-id "知识库ID" --folder-id "文件夹ID"
+
+# 导入到根目录（folder-id 留空）
+python batch_import_to_ima.py --import-json "公众号_全部文章_YYYYMMDD.json" \\
+    --kb-id "知识库ID"
 ```
 
-> 导入到根目录时 `folder_id` 留空字符串 `""`。建议写个小脚本批量读取 JSON 并循环调用 `import_urls`（每批 10 条、批间 `sleep 0.5`），避免手工拼 URL。
+### 一键全流程
+
+抓取 + 自动导入一步搞定，适合无人值守运行：
+
+```bash
+python fetch_articles.py --url "https://mp.weixin.qq.com/s/xxxx" \\
+    --name "公众号名称" \\
+    --save-master "./master.json" \\
+    --auto-import --kb-id "知识库ID"
+```
+
+`--save-master` 同时保存 master 全量基准。
+`--auto-import` 抓取完成后自动调用 batch_import_to_ima.py 导入 IMA。
+两者配合，跑一次就等于完成了整个工作流。
 
 ---
 
