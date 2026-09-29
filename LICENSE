@@ -24,9 +24,9 @@ SOFTWARE.
 
 Scope note / 许可范围说明：
 
-This MIT license covers the collection scaffolding only (root README, docs,
-CI workflows, .gitignore). Each skill under `skills/` keeps its own original
+This MIT license covers the collection scaffolding only (root README, CI
+workflows, .gitignore). Each skill under `skills/` keeps its own original
 license — see the LICENSE file inside each skill directory.
 
-本 MIT 许可仅覆盖本合集的骨架文件（根 README、docs、CI 工作流、.gitignore）。
+本 MIT 许可仅覆盖本合集的骨架文件（根 README、CI 工作流、.gitignore）。
 `skills/` 下每个 Skill 保留其原始独立许可，请查看各 Skill 目录内的 LICENSE。

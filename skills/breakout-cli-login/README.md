@@ -1,7 +1,7 @@
 breakout-cli Linux 安装与登录（微信扫码）
 ==========================================
 
-> 本 Skill 已收录于 [17-Skills](https://github.com/canyexuanfan/17-Skills) 合集（席位 02）。原仓库 [breakout-cli-linux-login](https://github.com/canyexuanfan/breakout-cli-linux-login) 已归档，历史与 Star 保留，后续更新在本仓库进行。
+> 本 Skill 已收录于 [17-Skills](https://github.com/canyexuanfan/17-Skills) 合集。原仓库 [breakout-cli-linux-login](https://github.com/canyexuanfan/breakout-cli-linux-login) 已归档，历史与 Star 保留，后续更新在本仓库进行。
 
 让 Linux 用户像 Windows/macOS 用户一样，微信扫码登录破局官网 CLI。
 
