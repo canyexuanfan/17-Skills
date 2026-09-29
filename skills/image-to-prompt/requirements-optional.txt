@@ -1,0 +1,2 @@
+# Optional helper only. SKILL.md itself has no Python dependency.
+Pillow>=10

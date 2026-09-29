@@ -1,0 +1,6 @@
+# 必需依赖（本 skill 的脚本必须 Python 环境运行，与纯 LLM skill 不同）
+blind-watermark>=0.4.4
+Pillow>=10
+numpy>=1.24
+opencv-python>=4.8
+PyWavelets>=1.4
