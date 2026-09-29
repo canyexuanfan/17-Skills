@@ -1,0 +1,13 @@
+# 凭证类文件一律不入库（合集级安全网；各 skill 目录另有自己的 .gitignore）
+weixin_credentials.py
+*.cookie
+cookies*.txt
+.env
+.env.*
+*.key
+*.pem
+
+# 运行产物
+__pycache__/
+*.pyc
+node_modules/

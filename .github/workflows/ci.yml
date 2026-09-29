@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gzh-to-ima:
+    runs-on: ubuntu-latest
+    # 仅当 01 号 skill 有改动时运行
+    if: ${{ !contains(github.event.head_commit.message, 'ci-skip') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Python syntax check
+        run: |
+          find skills/01-gzh-to-ima -name "*.py" -print0 | xargs -0 -n1 python -m py_compile
+
+      - name: Node syntax check
+        run: |
+          find skills/01-gzh-to-ima \( -name "*.cjs" -o -name "*.js" \) -print0 | xargs -0 -n1 node --check
+
+      - name: Secret leak scan
+        # 防御：检查实际代码目录是否误提交真实微信凭证 / 云密钥
+        # 只扫描代码目录，避免把 CI 文件和文档里的示例 grep 命令误当成泄露
+        run: |
+          if grep -rIin -E "wxuin=|slave_sid=|bizuin=|AKID[A-Za-z0-9]{10,}|token=15[0-9]{8}" \
+            skills/01-gzh-to-ima/wechat-to-ima skills/01-gzh-to-ima/ima-skill; then
+            echo "::error::检测到疑似私人凭证泄漏，已阻止。请检查改动。"
+            exit 1
+          fi
+          echo "secret scan passed"
+
+  breakout-cli-login:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'ci-skip') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python syntax check
+        run: |
+          python -m py_compile skills/02-breakout-cli-login/login.py
+
+      - name: Shell syntax check
+        run: |
+          bash -n skills/02-breakout-cli-login/setup.sh
