@@ -1,7 +1,9 @@
 # gzh-to-ima-skill
 
+> 本 Skill 已收录于 [17-Skills](https://github.com/canyexuanfan/17-Skills) 合集（席位 01）。原仓库 [gzh-to-ima-skill](https://github.com/canyexuanfan/gzh-to-ima-skill) 已归档，历史与 Star 保留，后续更新在本仓库进行。
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![CI](https://github.com/canyexuanfan/gzh-to-ima-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/canyexuanfan/gzh-to-ima-skill/actions/workflows/ci.yml)
+[![CI](https://github.com/canyexuanfan/17-Skills/actions/workflows/ci.yml/badge.svg)](https://github.com/canyexuanfan/17-Skills/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org)
 [![Node](https://img.shields.io/badge/node-18%2B-green.svg)](https://nodejs.org)
 
