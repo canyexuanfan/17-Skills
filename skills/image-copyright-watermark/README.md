@@ -60,3 +60,9 @@ image-copyright-watermark/
 ```
 
 本包不含真实用户图片、密码或凭证样本；测试素材为脚本临时生成的合成图。
+
+## 开源致谢与许可声明
+
+本 Skill 的频域盲水印核心算法基于开源项目 **[blind_watermark](https://github.com/guofei9987/blind_watermark)**（MIT License，Copyright (c) 2020 guofei9987）实现。本项目代码仅通过 pip 调用其公开 API，未修改、未内嵌其源码；该库经 `requirements.txt` 声明依赖安装，不随本包分发。
+
+运行时依赖均为宽松许可：numpy（BSD-3-Clause）、opencv-python（Apache 2.0）、Pillow（MIT-CMU）、PyWavelets（MIT/BSD-3-Clause）。
