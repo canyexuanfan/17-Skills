@@ -22,6 +22,11 @@ UX 细节：
   - 不接收账号密码；扫码由用户在官网完成，凭据不经本工具
   - token 仅写入系统 keyring，不落盘、不打印
   - 本工具不含任何个人数据
+
+环境依赖（部署前先确认，否则会卡在 keyring 上）：
+  - gnome-keyring        —— 提供 gnome-keyring-daemon / secret-tool
+  - dbus-x11             —— 提供 dbus-launch（Debian/Ubuntu 与 EL 系都在这个包里）
+  - 无需账号密码，空密码 keyring 即可（见 ensure_keyring 的实测说明）
 """
 import argparse
 import base64
@@ -29,6 +34,7 @@ import hashlib
 import json
 import os
 import secrets
+import shutil
 import subprocess
 import sys
 import time
@@ -124,19 +130,77 @@ def print_guide(uri: str, expires_at: str, is_renew: bool = False) -> None:
     print('  等待授权确认中...（Ctrl+C 取消）')
 
 
+def _secrets_up() -> bool:
+    """org.freedesktop.secrets 是否在线（keyring 已解锁）"""
+    try:
+        p = subprocess.run(
+            ['secret-tool', 'store', '--label', 'probe', 'service', 'breakout-probe', 'username', 'probe'],
+            input=b'probe', capture_output=True, timeout=15)
+        hit = (p.returncode == 0)
+        subprocess.run(['secret-tool', 'clear', 'service', 'breakout-probe', 'username', 'probe'],
+                       capture_output=True, timeout=15)
+        return hit
+    except Exception:
+        return False
+
+
 def ensure_keyring() -> None:
-    if 'DBUS_SESSION_BUS_ADDRESS' not in os.environ or not os.environ['DBUS_SESSION_BUS_ADDRESS']:
-        out = subprocess.run(['dbus-launch', '--sh-syntax'], capture_output=True, text=True, timeout=10)
+    """确保 session D-Bus 存在、且 keyring 已解锁（org.freedesktop.secrets 在线）。
+
+    实测要点（写错任何一条都会卡死在图形 prompter 上）：
+      · 用 dbus-launch 起 session —— 不要用 dbus-run-session（会走 prompter 分支）
+      · 用 --unlock 从 stdin 读密码（空密码即可）—— 不要加 --start（与 --unlock 不兼容）
+      · 不要把 org.gnome.keyring.SystemPrompter 指向 /bin/true
+        （会被 keyring 判定为"用户取消了 prompt"，collection 创建直接失败）
+    """
+    if _secrets_up():
+        return
+
+    if not os.environ.get('DBUS_SESSION_BUS_ADDRESS'):
+        try:
+            out = subprocess.run(['dbus-launch', '--sh-syntax'], capture_output=True, text=True, timeout=10)
+        except FileNotFoundError:
+            raise RuntimeError('缺少 dbus-launch —— 请安装 dbus-x11 后重试（Debian/EL 都在这个包里）')
         for line in out.stdout.strip().splitlines():
+            line = line.strip()
+            if line.startswith('export '):
+                line = line[len('export '):]
             if '=' in line:
                 k, _, v = line.partition('=')
-                os.environ[k.strip()] = v.strip().strip("'")
+                os.environ[k.strip()] = v.strip().strip("'\"")
+
+    if not shutil.which('gnome-keyring-daemon'):
+        raise RuntimeError('缺少 gnome-keyring-daemon —— 请安装 gnome-keyring 后重试')
+
+    # --unlock 从 stdin 读密码（空密码）→ 直接创建空密码 collection，不触发图形弹窗
+    subprocess.Popen('printf "\\n" | gnome-keyring-daemon --unlock --components=secrets >/dev/null 2>&1',
+                     shell=True)
+    for _ in range(10):
+        time.sleep(1)
+        if _secrets_up():
+            return
+    raise RuntimeError(
+        'keyring 解锁失败：org.freedesktop.secrets 始终不在线。请手动执行后重跑：\n'
+        '  eval "$(dbus-launch --sh-syntax)"\n'
+        '  printf "\\n" | gnome-keyring-daemon --unlock --components=secrets &   # 不要加 --start\n'
+        '  sleep 5 && secret-tool store --label=t service t username t <<< x'
+    )
 
 
 def secret_tool_store(service: str, username_key: str, secret: str, label: str) -> None:
-    proc = subprocess.run(
-        ['secret-tool', 'store', '--label', label, 'service', service, 'username', username_key],
-        input=secret.encode('utf-8'), capture_output=True, timeout=30)
+    if not shutil.which('secret-tool'):
+        raise RuntimeError(
+            '缺少 secret-tool —— 请安装 gnome-keyring（EL 系由它提供 secret-tool；'
+            'Debian/Ubuntu 可装 libsecret-tools）后重跑。')
+    try:
+        proc = subprocess.run(
+            ['secret-tool', 'store', '--label', label, 'service', service, 'username', username_key],
+            input=secret.encode('utf-8'), capture_output=True, timeout=60)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(
+            'secret-tool store 超时（60s）—— 大概率是 keyring 没解锁、触发了图形 prompter 在等界面。\n'
+            '  请先执行：eval "$(dbus-launch --sh-syntax)" 然后 '
+            'printf "\\n" | gnome-keyring-daemon --unlock --components=secrets &  （不要加 --start）')
     if proc.returncode != 0:
         raise RuntimeError(f"secret-tool store 失败: {proc.stderr.decode('utf-8', 'ignore')[:300]}")
 
@@ -172,7 +236,10 @@ def run_verification() -> None:
                 mark = '✓' if '"ok": true' in line or 'ok' in line.lower() else ('✓' if 'true' in line else '?')
                 print(f'  {mark} {line.strip()}')
     except FileNotFoundError:
-        print('  ⚠️ 未找到 breakout 命令，请确认 CLI 已安装')
+        print('  ⚠️ 未找到 breakout 命令。可能原因：')
+        print('     · CLI 没装上 → npm install -g @aipoju/breakout-cli')
+        print('     · Node 是 nvm 装的，当前 shell 没加载 nvm → source ~/.nvm/nvm.sh && nvm use 20')
+        print('     · 全局 bin 不在 PATH → 把 `npm bin -g` 的目录加进 PATH')
     except Exception as e:
         print(f'  ⚠️ doctor 运行异常: {e}')
     try:
@@ -221,6 +288,7 @@ def main():
     reminder_next = time.time() + REMIND_INTERVAL
     deadline = time.time() + AUTH_TIMEOUT
     last_progress = 0.0
+    last_expiry_warn = 0.0
 
     while True:
         remaining = int(deadline - time.time())
@@ -243,8 +311,9 @@ def main():
             print('✗ 等待超时（多次续期仍未确认），请重新运行', file=sys.stderr)
             sys.exit(4)
 
-        # 到期前提醒续期（剩余 <60s 时提示，避免扫到一半链接失效）
-        if remaining < RENEW_THRESHOLD and renew_count < MAX_RENEW:
+        # 到期前提醒续期（剩余 <60s 时提示，避免扫到一半链接失效；每 15 秒最多提示一次，别刷屏）
+        if remaining < RENEW_THRESHOLD and renew_count < MAX_RENEW and (time.time() - last_expiry_warn) >= 15:
+            last_expiry_warn = time.time()
             print()
             print(f'  ⚠️ 链接还剩 {remaining}s 即将过期，若还没扫码请加快，过期后会自动换新链接')
 
