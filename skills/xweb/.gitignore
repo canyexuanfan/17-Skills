@@ -1,0 +1,23 @@
+# 凭据绝不入库
+config.json
+state.json
+cookie*.txt
+tweet_index.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# 例外：xclid 预编译签名模块是随包分发的资产，不是构建产物
+!xweb/xclid/bin/**/*.pyd
+!xweb/xclid/bin/**/*.so
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# xweb — X（x.com）CLI 启动器（访客态 / 登录态）
+#
+# 默认子命令是 user：`xweb elonmusk` == `xweb user elonmusk`
+#
+# ⚠️ 子命令表从 CLI 自身派生（`--list-subs`），不硬编码。
+#    硬编码的代价：新增子命令忘了同步列表 → 该命令被塞进默认子命令 `user`
+#    → 报 `unrecognized arguments`。派生之后这类脱节不可能发生。
+set -euo pipefail
+
+REPO="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
+CLI="$REPO/xweb/cli.py"
+PY="${XWEB_PY:-python3}"
+
+if [ ! -f "$CLI" ]; then
+  echo "[xweb] 找不到 $CLI —— 请从仓库根目录运行 ./install.sh，或用 pipx install ." >&2
+  exit 2
+fi
+
+SUBS="$("$PY" "$CLI" --list-subs 2>/dev/null || true)"
+
+has_sub=0
+for a in "$@"; do
+  for s in $SUBS; do
+    if [ "$a" = "$s" ]; then has_sub=1; break 2; fi
+  done
+done
+
+if [ $has_sub -eq 0 ]; then
+  # 在「第一个非选项参数」之前插入默认子命令 user（全局选项必须留在前面）
+  out=(); inserted=0
+  for a in "$@"; do
+    if [ $inserted -eq 0 ] && [ "${a#-}" = "$a" ]; then out+=("user"); inserted=1; fi
+    out+=("$a")
+  done
+  [ $inserted -eq 0 ] && out+=("user")
+  exec "$PY" "$CLI" "${out[@]}"
+fi
+exec "$PY" "$CLI" "$@"

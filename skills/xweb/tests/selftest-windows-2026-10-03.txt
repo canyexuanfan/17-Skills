@@ -1,0 +1,25 @@
+xweb 签名模块 Windows 自检报告
+====================================
+日期：2026-10-03
+环境：Windows 11 x64（10.0.22631）/ Python 3.10.9 / curl_cffi（当日 pip 最新版）
+命令：python -m xweb.xclid --selftest
+网络：x.com 直连被重置，经本地代理执行后完成素材拉取
+
+输出：
+平台      : windows-amd64 | Python 3.10.9
+原生模块  : <包目录>\xweb\xclid\bin\windows-amd64\_xclid.abi3.pyd
+随包平台  : linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64, windows-amd64
+cookie    : 无（访客态也能取签名素材，但可能取不全）
+  [xclid] ⚠️ 页面资源不完整，继续尝试
+  [xclid] _z066f 48B
+  [xclid] 扫描资源（1 个）…
+✗ 签名失败：签名素材缺失（需登录态 cookie）
+
+结论：
+1. 通过项：Windows 原生模块（.pyd）加载、平台识别、5 平台齐全性检查、
+   x.com 公开素材拉取与扫描——签名模块在 Windows 上功能正常；
+2. 边界项：最终签名生成需要登录态 cookie 提供完整素材。这是设计边界而非缺陷：
+   访客态功能不依赖签名（见 README「边界与已知限制」第 9 条），
+   无 cookie 时自检按预期止步于此；
+3. 终态验证方法：持登录态的用户在本机运行同一命令，
+   输出签名长度 >60 即判定 ✅（自检内置判定）。

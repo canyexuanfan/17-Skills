@@ -1,0 +1,5 @@
+xweb — X (x.com) 命令行客户端
+Copyright 2026 canyexuanfan
+
+本产品包含随包分发的预编译签名模块（xweb/xclid/bin/ 下各平台二进制），
+以 Object 形式分发、不随附源码，相关说明见 README「边界与已知限制」与「许可」。
