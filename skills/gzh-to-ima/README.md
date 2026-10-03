@@ -1,5 +1,7 @@
 # gzh-to-ima-skill
 
+> ⚠️ **目前不可用**：微信公众号官方接口已关闭，本 Skill 的抓取链路已失效，暂时无法使用。仓库保留作为存档与参考，若接口恢复或找到替代方案会在此更新。
+>
 > 本 Skill 已收录于 [17-Skills](https://github.com/canyexuanfan/17-Skills) 合集。原仓库 [gzh-to-ima-skill](https://github.com/canyexuanfan/gzh-to-ima-skill) 已归档，历史与 Star 保留，后续更新在本仓库进行。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

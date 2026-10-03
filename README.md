@@ -10,7 +10,7 @@
 
 | Skill | 一句话 | 许可 |
 |-------|--------|------|
-| [gzh-to-ima](skills/gzh-to-ima/) | 微信公众号文章批量抓取并导入 IMA 知识库（含 `wechat-to-ima` 与 `ima-skill` 两组子技能） | MIT |
+| [gzh-to-ima](skills/gzh-to-ima/) | 微信公众号文章批量抓取并导入 IMA 知识库（含 `wechat-to-ima` 与 `ima-skill` 两组子技能）。**⚠️ 公众号官方接口已关闭，暂不可用**，保留作存档参考 | MIT |
 | [breakout-cli-login](skills/breakout-cli-login/) | 破局官网 CLI 的 Linux 一键安装与微信扫码登录 | AGPL-3.0 |
 | [image-copyright-watermark](skills/image-copyright-watermark/) | 隐形版权水印：盲水印 + EXIF/tEXt 署名双保险，盗图可提取溯源取证，纯本地运行 | MIT |
 | [image-to-prompt](skills/image-to-prompt/) | 图片高保真反推：把图片反推为可直接复用的文生图提示词，锁定版面、文字、连续色场与细节 | MIT |
