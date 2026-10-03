@@ -30,11 +30,6 @@ skills/
 
 各 Skill 的详细配置（凭证、依赖、频控等）见对应目录内的 README 与 SKILL.md。
 
-## 配套项目 · Ecosystem
-
-- **十七° Agent**：终端中的通用智能体，安装与发行见 [shiqi-agent-releases](https://github.com/canyexuanfan/shiqi-agent-releases)
-- **17deg Atlas**：Agent 原生知识管理，见 [17deg-atlas](https://github.com/canyexuanfan/17deg-atlas)
-
 ## 许可 · License
 
 - 合集骨架（根 README / CI / .gitignore）：[MIT](LICENSE)
