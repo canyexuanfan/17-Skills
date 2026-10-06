@@ -1,0 +1,5 @@
+rweb — reddit.com 命令行客户端
+Copyright 2026 canyexuanfan
+
+本产品的会话核心以预编译原生模块形式随包分发（rweb/rcore/bin/ 下各平台二进制），
+以 Object 形式分发、不随附源码，相关说明见 README 与 LICENSE。

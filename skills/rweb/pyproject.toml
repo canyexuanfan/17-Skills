@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rweb"
+version = "1.2.0"
+description = "Command-line client for reddit.com (guest + your own account)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Apache-2.0" }
+keywords = ["reddit", "cli", "json-api", "command-line"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet :: WWW/HTTP",
+]
+# curl 是外部依赖，不走 PyPI；原生核心随包分发，同样是零 pip 依赖
+dependencies = []
+
+[project.scripts]
+rweb = "rweb.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/canyexuanfan/17-Skills/tree/main/skills/rweb"
+
+[tool.setuptools]
+packages = ["rweb", "rweb.rcore"]
+
+[tool.setuptools.package-data]
+rweb = ["data/*.json", "rcore/bin/*/*"]

@@ -1,0 +1,24 @@
+# credentials never go into the repo
+config.json
+cookies.jar
+*.cookie
+cookie*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 例外：rcore 预编译核心模块是随包分发的资产，不是构建产物
+!rweb/rcore/bin/**/*.pyd
+!rweb/rcore/bin/**/*.so

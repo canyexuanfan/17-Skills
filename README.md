@@ -15,6 +15,7 @@
 | [image-copyright-watermark](skills/image-copyright-watermark/) | 隐形版权水印：盲水印 + EXIF/tEXt 署名双保险，盗图可提取溯源取证，纯本地运行 | MIT |
 | [image-to-prompt](skills/image-to-prompt/) | 图片高保真反推：把图片反推为可直接复用的文生图提示词，锁定版面、文字、连续色场与细节 | MIT |
 | [xweb](skills/xweb/) | X（x.com）命令行客户端：访客态零账号读公开数据，填自己 cookie 解锁全站读能力；预编译签名模块随包分发 | Apache-2.0 |
+| [rweb](skills/rweb/) | reddit.com 命令行客户端：访客态零账号读版面/帖子/评论树/搜索，填本人 cookie 解锁账号数据与写操作；零第三方依赖，核心模块预编译随包分发 | Apache-2.0 |
 
 ## 安装
 
@@ -33,5 +34,5 @@ skills/
 ## 许可 · License
 
 - 合集骨架（根 README / CI / .gitignore）：[MIT](LICENSE)
-- 各 Skill 保留原始许可：gzh-to-ima 为 [MIT](skills/gzh-to-ima/LICENSE)，breakout-cli-login 为 [AGPL-3.0](skills/breakout-cli-login/LICENSE)，image-copyright-watermark 与 image-to-prompt 为 [MIT](skills/image-copyright-watermark/LICENSE)，xweb 为 [Apache-2.0](skills/xweb/LICENSE)
+- 各 Skill 保留原始许可：gzh-to-ima 为 [MIT](skills/gzh-to-ima/LICENSE)，breakout-cli-login 为 [AGPL-3.0](skills/breakout-cli-login/LICENSE)，image-copyright-watermark 与 image-to-prompt 为 [MIT](skills/image-copyright-watermark/LICENSE)，xweb 与 rweb 为 [Apache-2.0](skills/xweb/LICENSE)
 - 收录历史：gzh-to-ima 与 breakout-cli-login 由同名原仓库 subtree 迁入（提交历史完整保留），原仓库已归档并指向本仓库；image-copyright-watermark、image-to-prompt、xweb 为本仓库首发

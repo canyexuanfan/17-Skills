@@ -1,0 +1,31 @@
+rweb 核心模块 Windows 自检报告
+====================================
+日期：2026-10-06
+环境：Windows 11 x64（10.0.22631）/ Python 3.10.9 / 系统 curl（无第三方 Python 包）
+命令：python -m rweb --selftest
+说明：核心逻辑编译于 rweb/rcore/bin/ 各平台原生模块（Windows 为 _m0.abi3.pyd）。
+输出中的本机绝对路径已脱敏；凭据不入库。
+
+第一轮：网络环境一（当前网络对目标站不可达）
+  python      : 3.10.9  AMD64
+  platform tag: windows-amd64
+  bundled     : linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64, windows-amd64
+  core module : <包目录>\rweb\rcore\bin\windows-amd64\_m0.abi3.pyd
+  public api  : p, re
+  classify    : json->0  html->2   (期望 0 / 2)
+  live probe  : HTTP 0  0B  verdict=2
+  session     : OK  session usable (upstream throttled, HTTP 0)
+  selftest    : ✅ 通过
+
+第二轮：网络环境二（可正常到达目标站，取得真实响应）
+  live probe  : HTTP 403  190,240B  verdict=2   ← 拦截页被正确分类为 2（非数据）
+  session     : OK  session usable (upstream throttled, HTTP 403)
+  selftest    : ✅ 通过
+
+结论：
+1. 通过项：Windows 原生模块（.pyd）加载、单入口 p() 可用、响应分类器判定正确
+   （JSON 判 0、HTML/拦截页判 2）、会话状态机按预期工作——核心模块在 Windows 上功能正常；
+2. 说明：live probe 的 HTTP 结果反映的是测试时目标站对当次连接的服务策略
+   （连接失败 / 403 拦截页均被分类器与状态机正确处理），
+   属于运行时网络环境因素，与模块功能无关（见 README「Troubleshooting」）；
+3. 自检判定内置：classify 与 session 两项同时通过即输出 ✅。

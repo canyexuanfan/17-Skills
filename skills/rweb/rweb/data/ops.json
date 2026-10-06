@@ -1,0 +1,521 @@
+{
+ "AddWikiContributor": {
+  "kind": "write",
+  "vars": {}
+ },
+ "AddWikiPageEditor": {
+  "kind": "write",
+  "vars": {}
+ },
+ "AssignCommunityRole": {
+  "kind": "write",
+  "vars": {
+   "roleId": {
+    "_": ""
+   },
+   "subredditId": {
+    "_": ""
+   },
+   "userId": {
+    "_": ""
+   }
+  }
+ },
+ "BatchCompleteMultipartMediaUpload": {
+  "kind": "write",
+  "vars": {}
+ },
+ "BatchCreateMediaUploadLease": {
+  "kind": "write",
+  "vars": {}
+ },
+ "CreateMediaUploadLease": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "CreateShareUrl": {
+  "kind": "write",
+  "vars": {}
+ },
+ "DeletePost": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "postId": "<post fullname>"
+   }
+  }
+ },
+ "DeleteSubredditMuteSettings": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "DisapproveRedditor": {
+  "kind": "write",
+  "vars": {}
+ },
+ "EvaluateCommentAutomationsByPostId": {
+  "kind": "read",
+  "vars": {
+   "input": {},
+   "postId": "<post fullname>"
+  }
+ },
+ "EvaluatePostAutomations": {
+  "kind": "read",
+  "vars": {
+   "input": {},
+   "subredditId": "<subreddit fullname>"
+  }
+ },
+ "ExperimentVariant": {
+  "kind": "read",
+  "vars": {
+   "name": "x"
+  }
+ },
+ "ExposeVariant": {
+  "kind": "read",
+  "vars": {
+   "input": {
+    "experimentName": "x",
+    "experimentVersion": "1",
+    "targetingInputs": [],
+    "variant": "control_1"
+   }
+  }
+ },
+ "ExposeVariantBatch": {
+  "kind": "read",
+  "vars": {
+   "inputs": []
+  }
+ },
+ "GeneratedUsernames": {
+  "kind": "read",
+  "vars": {
+   "count": 3
+  }
+ },
+ "GetAdBusinessNameById": {
+  "kind": "read",
+  "vars": {
+   "postId": "<post fullname>"
+  }
+ },
+ "GetIsCommentGuidanceAvailableFromPostId": {
+  "kind": "read",
+  "vars": {
+   "postId": {
+    "_": ""
+   }
+  }
+ },
+ "GetPostGalleryMediaStatus": {
+  "kind": "read",
+  "vars": {
+   "id": "<post fullname>"
+  }
+ },
+ "GetPostMediaStatus": {
+  "kind": "read",
+  "vars": {
+   "id": "<post fullname>"
+  }
+ },
+ "IsEmailValidForRegistration": {
+  "kind": "read",
+  "vars": {
+   "input": {
+    "email": "a@b.com",
+    "subscribeToNewsletter": false
+   }
+  }
+ },
+ "IsUsernameValidForRegistration": {
+  "kind": "read",
+  "vars": {
+   "input": {
+    "username": "someone"
+   }
+  }
+ },
+ "ModBulkApprove": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkIgnore": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkLock": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkMarkNSFW": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkMarkSpoiler": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkRemove": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkUnignore": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkUnlock": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkUnmarkNSFW": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkUnmarkSpoiler": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModBulkUpdatePostFlair": {
+  "kind": "write",
+  "vars": {}
+ },
+ "ModeratorEvaluateCommentAutomations": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   },
+   "subredditId": {
+    "_": ""
+   }
+  }
+ },
+ "ModeratorEvaluatePostAutomations": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   },
+   "subredditId": {
+    "_": ""
+   }
+  }
+ },
+ "PreviewCommentAutomation": {
+  "kind": "read",
+  "vars": {
+   "input": {},
+   "subredditId": "<subreddit fullname>"
+  }
+ },
+ "PreviewPostAutomation": {
+  "kind": "read",
+  "vars": {
+   "input": {},
+   "subredditId": "<subreddit fullname>"
+  }
+ },
+ "RemoveHighlightedPost": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "RemoveWikiContributor": {
+  "kind": "write",
+  "vars": {}
+ },
+ "RemoveWikiPageEditor": {
+  "kind": "write",
+  "vars": {}
+ },
+ "RenderSavedResponseTemplateBySubredditId": {
+  "kind": "read",
+  "vars": {
+   "responseId": "",
+   "subredditId": "<subreddit fullname>",
+   "variables": {}
+  }
+ },
+ "ReorderHighlightedPosts": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "RestoreWikiPageRevision": {
+  "kind": "write",
+  "vars": {
+   "reason": "",
+   "revisionId": "",
+   "subredditName": "programming",
+   "wikiPageName": "index"
+  }
+ },
+ "SaveWikiPageSettings": {
+  "kind": "write",
+  "vars": {}
+ },
+ "SendMessageToSubreddit": {
+  "kind": "write",
+  "vars": {}
+ },
+ "SetSuggestedSort": {
+  "kind": "write",
+  "vars": {}
+ },
+ "StoreUxtargetingAction": {
+  "kind": "write",
+  "vars": {}
+ },
+ "SubmitUserContactForAd": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "SyncSearchHistory": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateAccountPreferences": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateAdHideState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "UpdateCommentDistinguishedState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateCommentLockedState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateCommentStickyState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateCommentVoteState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "commentId": "<comment fullname>",
+    "voteState": "UP"
+   }
+  }
+ },
+ "UpdateCommercialCommunicationState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateContributorRequestTimestamp": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateHighlightedPost": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "UpdateNotificationPreferences": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdatePostDistinguishedState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdatePostFollowState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "followState": "FOLLOWED",
+    "postId": "<post fullname>"
+   }
+  }
+ },
+ "UpdatePostHideState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "hideState": "HIDDEN",
+    "postId": "<post fullname>"
+   }
+  }
+ },
+ "UpdatePostLockedState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "lockedState": "LOCKED",
+    "postId": "<post fullname>"
+   }
+  }
+ },
+ "UpdatePostNsfwState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "nsfwState": "NSFW",
+    "postId": "<post fullname>"
+   }
+  }
+ },
+ "UpdatePostSaveState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "postId": "<post fullname>",
+    "saveState": "SAVED"
+   }
+  }
+ },
+ "UpdatePostSendRepliesState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "postId": "<post fullname>",
+    "sendRepliesState": "SEND"
+   }
+  }
+ },
+ "UpdatePostSpoilerState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "postId": "<post fullname>",
+    "spoilerState": "SPOILER"
+   }
+  }
+ },
+ "UpdatePostStickyState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "UpdatePostVoteState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "postId": "<post fullname>",
+    "voteState": "UP"
+   }
+  }
+ },
+ "UpdateProfileFollowState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateRecommendationPreferences": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateReportState": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateSubredditFavoriteState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "favoriteState": "FAVORITED",
+    "subredditId": "<subreddit fullname>"
+   }
+  }
+ },
+ "UpdateSubredditModeratorState": {
+  "kind": "write",
+  "vars": {
+   "action": {
+    "_": ""
+   },
+   "permissions": [],
+   "subredditId": {
+    "_": ""
+   },
+   "userId": {
+    "_": ""
+   }
+  }
+ },
+ "UpdateSubredditMuteAndNotificationLevelSettings": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateSubredditRuleAutoEnforcementSettings": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateSubredditSubscriptions": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "inputs": []
+   }
+  }
+ },
+ "UpdateUserInterestTopics": {
+  "kind": "write",
+  "vars": {}
+ },
+ "UpdateWelcomePageContent": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "UpdateWelcomePageState": {
+  "kind": "write",
+  "vars": {
+   "input": {
+    "_": ""
+   }
+  }
+ },
+ "UpsertWikiPage": {
+  "kind": "write",
+  "vars": {}
+ },
+ "WikiComparisonDiff": {
+  "kind": "read",
+  "vars": {
+   "comparisonRevisionId": "",
+   "revisionId": "",
+   "subredditName": "programming",
+   "wikiPageName": "index"
+  }
+ }
+}
