@@ -120,3 +120,29 @@ jobs:
             exit 1
           fi
           echo "secret scan passed"
+
+  remove-watermark-syntax:
+    # remove-visible-watermark：纯算法图像处理（numpy/Pillow/opencv，CI 仅语法+凭证扫描，不装重型依赖）
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'ci-skip') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python syntax check
+        run: |
+          find skills/remove-visible-watermark/scripts -name "*.py" -print0 | xargs -0 -n1 python -m py_compile
+
+      - name: Secret leak scan
+        run: |
+          if grep -rIin -E "wxuin=|slave_sid=|bizuin=|AKID[A-Za-z0-9]{10,}|token=15[0-9]{8}|api[_-]?key['\"]?\s*[:=]\s*['\"][A-Za-z0-9_-]{16,}" \
+            skills/remove-visible-watermark --include="*.py" --include="*.json"; then
+            echo "::error::检测到疑似凭证泄漏，已阻止。请检查改动。"
+            exit 1
+          fi
+          echo "secret scan passed"

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "workbuddy-corner-v1",
+  "template": "workbuddy-corner-v1-alpha.png",
+  "template_kind": "alpha_u8",
+  "foreground_rgb": [
+    255,
+    255,
+    255
+  ],
+  "compositing_domain": "encoded_rgb",
+  "reference_canvas": [
+    1920,
+    1072
+  ],
+  "reference_bbox": [
+    1788,
+    1009,
+    1915,
+    1066
+  ],
+  "anchor": "bottom_right",
+  "search_radius_px": 48,
+  "scale_modes": [
+    "native",
+    "canvas"
+  ],
+  "alpha_support_threshold": 0.00392156862745098,
+  "detection": {
+    "min_shape_score": 0.48,
+    "min_gray_score": 0.08,
+    "min_inverse_improvement": 0.2,
+    "max_out_of_range_fraction": 0.05
+  },
+  "calibration": {
+    "source": "WorkBuddy corner watermark sample on a near-black lower border.",
+    "measurement": "The black-background observation estimates premultiplied color T=alpha*W.",
+    "foreground_white_is_assumed": true,
+    "alpha_is_assumed_T_divided_by_255": true,
+    "official_ground_truth": false,
+    "real_samples_have_no_clean_ground_truth": true,
+    "reference_canvas": [
+      1920,
+      1072
+    ],
+    "reference_bbox_xyxy_exclusive": [
+      1788,
+      1009,
+      1915,
+      1066
+    ],
+    "maximum_assumed_alpha": 0.5450980392156862,
+    "supported_conditions": "Same text rendering, color, opacity and encoded RGB compositing; integer translation or isotropic native/canvas scale."
+  },
+  "notes": "This profile describes the two supplied samples only, not all WorkBuddy exports. The profile contains an extracted watermark layer rather than either complete source image. Rotation, crop, altered fonts/opacity, color management, JPEG damage and unusual resizing can cause a deliberate no-match result. Scores are heuristic similarities, not calibrated probabilities."
+}

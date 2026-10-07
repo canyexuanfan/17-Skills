@@ -1,0 +1,2010 @@
+{
+  "version": "1.3.0",
+  "date": "2026-10-07",
+  "scope": "Targeted iteration on observed outline misses, ROI sensitivity, copied foreign material, and strict-source coverage failure; approximate classical reconstruction with measured limitations.",
+  "regression": {
+    "environment": {
+      "python": "3.12.14",
+      "platform": "linux",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "opencv": "4.11.0"
+    },
+    "counts": {
+      "passed": 24,
+      "failed": 0,
+      "total": 24
+    },
+    "duration_seconds": 15.2286,
+    "cases": [
+      {
+        "id": "telea_rgb_mask_boundaries_and_preview",
+        "status": "passed"
+      },
+      {
+        "id": "ns_rgb_mask_boundaries_and_no_preview",
+        "status": "passed"
+      },
+      {
+        "id": "rgba_alpha_and_protect_mask",
+        "status": "passed"
+      },
+      {
+        "id": "flat_background_synthetic_truth",
+        "status": "passed"
+      },
+      {
+        "id": "shifted_builtin_template_inverse_regression",
+        "status": "passed"
+      },
+      {
+        "id": "no_match_is_skipped",
+        "status": "passed"
+      },
+      {
+        "id": "input_overwrite_is_always_rejected",
+        "status": "passed"
+      },
+      {
+        "id": "wrong_size_mask_has_clear_error",
+        "status": "passed"
+      },
+      {
+        "id": "nonfinite_radius_has_clear_error",
+        "status": "passed"
+      },
+      {
+        "id": "nonfinite_profile_number_has_clear_error",
+        "status": "passed"
+      },
+      {
+        "id": "opaque_alpha_template_is_rejected",
+        "status": "passed"
+      },
+      {
+        "id": "batch_same_stem_outputs_do_not_collide",
+        "status": "passed"
+      },
+      {
+        "id": "batch_mixed_error_is_reported",
+        "status": "passed"
+      },
+      {
+        "id": "text_roi_builds_stroke_mask_and_auto_uses_exemplar",
+        "status": "passed"
+      },
+      {
+        "id": "text_descender_and_dark_outline_tails_are_covered",
+        "status": "passed"
+      },
+      {
+        "id": "text_morphology_preserves_unmarked_high_contrast_object",
+        "status": "passed"
+      },
+      {
+        "id": "exemplar_protected_watermark_is_excluded_from_donors",
+        "status": "passed"
+      },
+      {
+        "id": "selection_and_selection_preview_artifacts",
+        "status": "passed"
+      },
+      {
+        "id": "consensus_refinement_cli_scope_and_explicit_method",
+        "status": "passed"
+      },
+      {
+        "id": "consensus_reaches_bounded_sources_and_covers_sparse_support",
+        "status": "passed"
+      },
+      {
+        "id": "consensus_rejects_reflected_padding_as_complete_source",
+        "status": "passed"
+      },
+      {
+        "id": "explicit_source_exclusion_preserves_selection_and_blocks_donor_influence",
+        "status": "passed"
+      },
+      {
+        "id": "invalid_text_roi_and_quality_have_clear_errors",
+        "status": "passed"
+      },
+      {
+        "id": "unlettered_text_roi_is_not_rectangularly_erased",
+        "status": "passed"
+      }
+    ]
+  },
+  "text_mask_regression": {
+    "narrow": {
+      "roi": [
+        1258,
+        1956,
+        1510,
+        2023
+      ],
+      "selection_pixels": 10930,
+      "bbox": [
+        1261,
+        1961,
+        1506,
+        2021
+      ],
+      "missing_inspected_outline_points": [],
+      "tail_points_retained": true,
+      "normal_edge_and_isolated_texture_points_unchanged": true,
+      "diagnostics": {
+        "detector": "pale_text_dark_outline_v3",
+        "explicit_roi": true,
+        "heuristic_only": true,
+        "needs_review": true,
+        "roi": [
+          1258,
+          1956,
+          1510,
+          2023
+        ],
+        "background_context_bbox": [
+          1226,
+          1924,
+          1536,
+          2048
+        ],
+        "initial_median_kernel": 21,
+        "median_kernel": 23,
+        "geometry_height": 43.0,
+        "geometry_kernel_target": 23,
+        "geometry_refinement_performed": true,
+        "seed_bridge_split_applied": true,
+        "seed_bridge_pixels": 336,
+        "seed_reconstruction_radius": 3,
+        "outline_continuation_pixels": 48,
+        "outline_continuation_extra_radius": 3,
+        "noise_estimate": 1.4826,
+        "bright_threshold": 10.0,
+        "dark_threshold": 11.0,
+        "row_height": 48.2,
+        "row_margin": 6,
+        "rejected_dark_edge_growth_pixels": 7,
+        "tall_components": 4,
+        "column_segments": 7,
+        "aspect_ratio": 4.083333333333333,
+        "mask_occupancy": 0.7435374149659864,
+        "height_cv": 0.1113373401092998,
+        "warnings": [
+          "No OCR or semantic watermark identification.",
+          "Pale text and dark outline may be confused with image content.",
+          "The mask is an estimate; complex backgrounds and very low contrast can leave uncertain pixels.",
+          "Enclosed small glyph gaps may include some real background to cover low-contrast stroke interiors."
+        ]
+      }
+    },
+    "wide": {
+      "roi": [
+        1252,
+        1954,
+        1512,
+        2024
+      ],
+      "selection_pixels": 10930,
+      "bbox": [
+        1261,
+        1961,
+        1506,
+        2021
+      ],
+      "missing_inspected_outline_points": [],
+      "tail_points_retained": true,
+      "normal_edge_and_isolated_texture_points_unchanged": true,
+      "diagnostics": {
+        "detector": "pale_text_dark_outline_v3",
+        "explicit_roi": true,
+        "heuristic_only": true,
+        "needs_review": true,
+        "roi": [
+          1252,
+          1954,
+          1512,
+          2024
+        ],
+        "background_context_bbox": [
+          1220,
+          1922,
+          1536,
+          2048
+        ],
+        "initial_median_kernel": 23,
+        "median_kernel": 23,
+        "geometry_height": 43.0,
+        "geometry_kernel_target": 23,
+        "geometry_refinement_performed": false,
+        "seed_bridge_split_applied": true,
+        "seed_bridge_pixels": 366,
+        "seed_reconstruction_radius": 3,
+        "outline_continuation_pixels": 48,
+        "outline_continuation_extra_radius": 3,
+        "noise_estimate": 1.4826,
+        "bright_threshold": 10.0,
+        "dark_threshold": 11.0,
+        "row_height": 48.2,
+        "row_margin": 6,
+        "rejected_dark_edge_growth_pixels": 7,
+        "tall_components": 4,
+        "column_segments": 7,
+        "aspect_ratio": 4.083333333333333,
+        "mask_occupancy": 0.7435374149659864,
+        "height_cv": 0.1113373401092998,
+        "warnings": [
+          "No OCR or semantic watermark identification.",
+          "Pale text and dark outline may be confused with image content.",
+          "The mask is an estimate; complex backgrounds and very low contrast can leave uncertain pixels.",
+          "Enclosed small glyph gaps may include some real background to cover low-contrast stroke interiors."
+        ]
+      }
+    },
+    "outer": {
+      "roi": [
+        1240,
+        1940,
+        1520,
+        2032
+      ],
+      "selection_pixels": 10929,
+      "bbox": [
+        1261,
+        1961,
+        1505,
+        2021
+      ],
+      "missing_inspected_outline_points": [],
+      "tail_points_retained": true,
+      "normal_edge_and_isolated_texture_points_unchanged": true,
+      "diagnostics": {
+        "detector": "pale_text_dark_outline_v3",
+        "explicit_roi": true,
+        "heuristic_only": true,
+        "needs_review": true,
+        "roi": [
+          1240,
+          1940,
+          1520,
+          2032
+        ],
+        "background_context_bbox": [
+          1208,
+          1908,
+          1536,
+          2048
+        ],
+        "initial_median_kernel": 29,
+        "median_kernel": 25,
+        "geometry_height": 48.0,
+        "geometry_kernel_target": 25,
+        "geometry_refinement_performed": true,
+        "seed_bridge_split_applied": true,
+        "seed_bridge_pixels": 489,
+        "seed_reconstruction_radius": 3,
+        "outline_continuation_pixels": 57,
+        "outline_continuation_extra_radius": 3,
+        "noise_estimate": 1.4826,
+        "bright_threshold": 10.0,
+        "dark_threshold": 11.0,
+        "row_height": 50.0,
+        "row_margin": 6,
+        "rejected_dark_edge_growth_pixels": 7,
+        "tall_components": 4,
+        "column_segments": 7,
+        "aspect_ratio": 4.066666666666666,
+        "mask_occupancy": 0.746516393442623,
+        "height_cv": 0.12108480503727388,
+        "warnings": [
+          "No OCR or semantic watermark identification.",
+          "Pale text and dark outline may be confused with image content.",
+          "The mask is an estimate; complex backgrounds and very low contrast can leave uncertain pixels.",
+          "Enclosed small glyph gaps may include some real background to cover low-contrast stroke interiors."
+        ]
+      }
+    },
+    "independent": {
+      "roi": [
+        1248,
+        1955,
+        1516,
+        2029
+      ],
+      "selection_pixels": 10929,
+      "bbox": [
+        1261,
+        1961,
+        1505,
+        2021
+      ],
+      "missing_inspected_outline_points": [],
+      "tail_points_retained": true,
+      "normal_edge_and_isolated_texture_points_unchanged": true,
+      "diagnostics": {
+        "detector": "pale_text_dark_outline_v3",
+        "explicit_roi": true,
+        "heuristic_only": true,
+        "needs_review": true,
+        "roi": [
+          1248,
+          1955,
+          1516,
+          2029
+        ],
+        "background_context_bbox": [
+          1216,
+          1923,
+          1536,
+          2048
+        ],
+        "initial_median_kernel": 25,
+        "median_kernel": 25,
+        "geometry_height": 48.0,
+        "geometry_kernel_target": 25,
+        "geometry_refinement_performed": false,
+        "seed_bridge_split_applied": true,
+        "seed_bridge_pixels": 375,
+        "seed_reconstruction_radius": 3,
+        "outline_continuation_pixels": 57,
+        "outline_continuation_extra_radius": 3,
+        "noise_estimate": 1.4826,
+        "bright_threshold": 10.0,
+        "dark_threshold": 11.0,
+        "row_height": 50.0,
+        "row_margin": 6,
+        "rejected_dark_edge_growth_pixels": 7,
+        "tall_components": 4,
+        "column_segments": 7,
+        "aspect_ratio": 4.066666666666666,
+        "mask_occupancy": 0.746516393442623,
+        "height_cv": 0.12108480503727388,
+        "warnings": [
+          "No OCR or semantic watermark identification.",
+          "Pale text and dark outline may be confused with image content.",
+          "The mask is an estimate; complex backgrounds and very low contrast can leave uncertain pixels.",
+          "Enclosed small glyph gaps may include some real background to cover low-contrast stroke interiors."
+        ]
+      }
+    },
+    "narrow_wide_xor": 0,
+    "outer_independent_xor": 0,
+    "source_sha256": "3b4cd5515f397a052a6a21ab290a5cc9002734dc13dcd26434860f500baf9805",
+    "evidence_note": "Native-resolution original photo; manually inspected contour points are regression checks, not full segmentation truth."
+  },
+  "user_sample": {
+    "input_filename": "image(2).png",
+    "input_sha256": "fbe88e201dfec22d85ae8c3486f4e54e0233a01eae4a5377070bf3ee546d36bf",
+    "text_roi_xyxy": [
+      1252,
+      1954,
+      1512,
+      2024
+    ],
+    "selection_pixels": 10930,
+    "explicit_source_exclusion_used": false,
+    "validation": {
+      "output_size": [
+        1536,
+        2048
+      ],
+      "output_mode": "RGBA",
+      "outside_mask_changed_pixels": 0,
+      "outside_mask_max_channel_difference": 0,
+      "alpha_changed_pixels": 0,
+      "input_unchanged": true,
+      "changed_pixels": 10916,
+      "write_mask_pixels": 10916,
+      "write_mask_percent": 0.34701029459635413,
+      "output_sha256": "90abdd4c84adb749d0b1ee1a841457509fbc63f709ba09bb58c387df54f0434c"
+    },
+    "detail_checks": {
+      "version": "1.3.0",
+      "input_sha256": "fbe88e201dfec22d85ae8c3486f4e54e0233a01eae4a5377070bf3ee546d36bf",
+      "output_sha256": "90abdd4c84adb749d0b1ee1a841457509fbc63f709ba09bb58c387df54f0434c",
+      "size_wh": [
+        1536,
+        2048
+      ],
+      "mode": "RGBA",
+      "selection_pixels": 10930,
+      "actual_changed_pixels": 10916,
+      "outside_selection_changed_pixels": 0,
+      "alpha_changed_pixels": 0,
+      "input_unchanged": true,
+      "actual_mask_sidecar_exact": true,
+      "explicit_source_exclusion_used": false,
+      "detail_points": {
+        "descender": [
+          {
+            "xy": [
+              1464,
+              2018
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              178,
+              166,
+              160
+            ],
+            "output_rgb": [
+              227,
+              212,
+              206
+            ]
+          },
+          {
+            "xy": [
+              1464,
+              2019
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              205,
+              193,
+              187
+            ],
+            "output_rgb": [
+              227,
+              213,
+              207
+            ]
+          },
+          {
+            "xy": [
+              1478,
+              2018
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              216,
+              206,
+              204
+            ],
+            "output_rgb": [
+              231,
+              219,
+              217
+            ]
+          },
+          {
+            "xy": [
+              1479,
+              2018
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              222,
+              213,
+              211
+            ],
+            "output_rgb": [
+              231,
+              220,
+              217
+            ]
+          }
+        ],
+        "normal_table_edge": [
+          {
+            "xy": [
+              1489,
+              1962
+            ],
+            "selected": false,
+            "changed": false,
+            "input_rgb": [
+              98,
+              62,
+              54
+            ],
+            "output_rgb": [
+              98,
+              62,
+              54
+            ]
+          },
+          {
+            "xy": [
+              1490,
+              1962
+            ],
+            "selected": false,
+            "changed": false,
+            "input_rgb": [
+              96,
+              59,
+              52
+            ],
+            "output_rgb": [
+              96,
+              59,
+              52
+            ]
+          }
+        ],
+        "right_outline": [
+          {
+            "xy": [
+              1498,
+              2000
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              205,
+              195,
+              192
+            ],
+            "output_rgb": [
+              233,
+              222,
+              219
+            ]
+          },
+          {
+            "xy": [
+              1499,
+              2001
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              192,
+              183,
+              180
+            ],
+            "output_rgb": [
+              233,
+              222,
+              219
+            ]
+          },
+          {
+            "xy": [
+              1500,
+              2002
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              186,
+              176,
+              175
+            ],
+            "output_rgb": [
+              233,
+              222,
+              219
+            ]
+          },
+          {
+            "xy": [
+              1501,
+              2003
+            ],
+            "selected": true,
+            "changed": true,
+            "input_rgb": [
+              190,
+              180,
+              179
+            ],
+            "output_rgb": [
+              232,
+              220,
+              218
+            ]
+          }
+        ]
+      },
+      "display_crop_xyxy_exclusive": [
+        1240,
+        1940,
+        1536,
+        2038
+      ],
+      "display_scale": 4,
+      "display_resampling": "nearest; original processing was not resized",
+      "hidden_background_truth_available": false,
+      "scope_note": "Pixel bounds and inspected examples are separate from visual reconstruction quality."
+    },
+    "review": {
+      "version": "1.3.0",
+      "visual_assessment": "Inspected lower descenders and the thin right hook are covered. No readable watermark or large copied chair-material patch is visible. Some fine wood texture remains softened.",
+      "manual_source_exclusion_used": false,
+      "hidden_background_truth_available": false,
+      "comparison_note": "The comparison labels the v1.2 delivered image with its manual source exclusion and the v1.3 full pipeline without manual source exclusion; it is not a controlled algorithm-only benchmark."
+    },
+    "refinement": {
+      "method": "structure_guided_original_donor_consensus",
+      "restoration_kind": "optional_structure_guided_gradient_refinement",
+      "initial_quality_hint": "balanced",
+      "refinement_profile": "19px_patch_6px_stride_structure_guided_bounded_context",
+      "processed_mask_pixels": 10930,
+      "patch_radius": 9,
+      "search_radius": 112,
+      "center_stride": 6,
+      "source_guard_radius": 2,
+      "source_policy": "intact original patches only, inside real image; independent internal gradients",
+      "source_excluded_pixels_in_context": 12785,
+      "excluded_fixed_boundary_pixels": 828,
+      "intact_source_centers": 53568,
+      "vote_centers": 522,
+      "votes": 522,
+      "skipped_centers": 0,
+      "independently_scored_centers": 522,
+      "matching_locations_evaluated": 18475602,
+      "bounded_context_search_centers": 0,
+      "low_support_propagated_centers": 0,
+      "gradient_aggregation": "weighted overlapping independent original-donor gradients",
+      "color_aggregation": "weighted overlapping original-donor colours",
+      "covered_write_pixels": 10930,
+      "covered_required_x_edges": 11191,
+      "covered_required_y_edges": 11242,
+      "donor_rms_median": 3.988819760633664,
+      "donor_rms_p95": 21.47391155827727,
+      "roi_xyxy_exclusive": [
+        0,
+        0,
+        406,
+        218
+      ],
+      "clipped_pixels": 0,
+      "solver": {
+        "iterations": 61,
+        "rms_residual": 0.0009689605060247005,
+        "channel_rms_residual": [
+          0.0009685842724654502,
+          0.0009851051769083493,
+          0.0009529248051487982
+        ],
+        "rms_tolerance": 0.001,
+        "converged": true,
+        "screen_weight": 0.015,
+        "boundary_policy": "fixed original values outside the write mask; real image edges only"
+      },
+      "matching_guide": "harmonic colours plus locally consistent or bilaterally observed-edge-supported weak initial continuation; never a donor",
+      "initial_matching_pixels_retained": 3402,
+      "initial_matching_pixels_replaced": 7528,
+      "initial_consistency_rule": "at least 12 clean samples; max RGB deviation <= max(12, 2.5*local original RGB sigma), with 2px rejection guard",
+      "guide_solver": {
+        "iterations": 123,
+        "rms_residual": 0.0009680610742622877,
+        "channel_rms_residual": [
+          0.0009621236269990664,
+          0.0009721544546607622,
+          0.0009698765762502783
+        ],
+        "rms_tolerance": 0.001,
+        "converged": true,
+        "screen_weight": 0.0,
+        "boundary_policy": "fixed original values outside the write mask; real image edges only"
+      },
+      "observed_structure": {
+        "proposals": 128,
+        "accepted_segments": 5,
+        "protected_pixels": 940,
+        "observed_edge_pixels": 14055,
+        "budget_exceeded": false,
+        "rule": "observed clean gradients on both ends, at least 8 oriented samples per side"
+      },
+      "line_proposal_budget": 128,
+      "observed_edge_pixel_budget": 50000,
+      "initial_role": "weak matching continuation with local background consistency or observed bilateral line support",
+      "needs_review": true,
+      "warnings": [
+        "Original donor estimates may still select inappropriate texture, and overlapping consensus can soften fine detail.",
+        "The input selection must cover the watermark; unselected remnants remain unchanged.",
+        "Hidden original content is unknown; inspect the result before accepting it.",
+        "Some donor matches are weak; copied texture may be inappropriate.",
+        "Source-excluded pixels preserved outside the write mask constrain the Poisson boundary; protected watermark colors can influence adjacent repairs."
+      ],
+      "outside_write_mask_changed_pixels": 0,
+      "elapsed_seconds": 4.026,
+      "accuracy_against_original": null
+    }
+  },
+  "strict_source_regression": {
+    "previous_version_status": "error: incomplete color-vote coverage",
+    "same_original_mask_and_source_exclusion": true,
+    "input_sha256": "fbe88e201dfec22d85ae8c3486f4e54e0233a01eae4a5377070bf3ee546d36bf",
+    "mask_sha256": "e15f54dabb7443f42943e140d7b087d1da11b3d327e45bd4cbaf1f58f75c2e59",
+    "source_exclusion_sha256": "438c952710b00662cab5cb23698137cb396c5ee7afe56c122d7b48390360f2f6",
+    "selection_pixels": 11205,
+    "validation": {
+      "output_size": [
+        1536,
+        2048
+      ],
+      "output_mode": "RGBA",
+      "outside_mask_changed_pixels": 0,
+      "outside_mask_max_channel_difference": 0,
+      "alpha_changed_pixels": 0,
+      "input_unchanged": true,
+      "changed_pixels": 11187,
+      "write_mask_pixels": 11187,
+      "write_mask_percent": 0.3556251525878906,
+      "output_sha256": "1806d704bd2a6011cbdb8e9d283a10b69bbb77f6df765a89dbbb9e6652eb8e3f"
+    },
+    "refinement": {
+      "method": "structure_guided_original_donor_consensus",
+      "restoration_kind": "optional_structure_guided_gradient_refinement",
+      "initial_quality_hint": "balanced",
+      "refinement_profile": "19px_patch_6px_stride_structure_guided_bounded_context",
+      "processed_mask_pixels": 11205,
+      "patch_radius": 9,
+      "search_radius": 112,
+      "center_stride": 6,
+      "source_guard_radius": 2,
+      "source_policy": "intact original patches only, inside real image; independent internal gradients",
+      "source_excluded_pixels_in_context": 77867,
+      "excluded_fixed_boundary_pixels": 90,
+      "intact_source_centers": 2720,
+      "vote_centers": 532,
+      "votes": 532,
+      "skipped_centers": 0,
+      "independently_scored_centers": 521,
+      "matching_locations_evaluated": 16672183,
+      "bounded_context_search_centers": 80,
+      "low_support_propagated_centers": 11,
+      "gradient_aggregation": "weighted overlapping independent original-donor gradients",
+      "color_aggregation": "weighted overlapping original-donor colours",
+      "covered_write_pixels": 11205,
+      "covered_required_x_edges": 11475,
+      "covered_required_y_edges": 11531,
+      "donor_rms_median": 6.460990244393737,
+      "donor_rms_p95": 40.80245896452912,
+      "roi_xyxy_exclusive": [
+        0,
+        0,
+        409,
+        219
+      ],
+      "clipped_pixels": 0,
+      "solver": {
+        "iterations": 79,
+        "rms_residual": 0.0009470525839476525,
+        "channel_rms_residual": [
+          0.0009275455288936594,
+          0.0009327540620799849,
+          0.0009799770108469084
+        ],
+        "rms_tolerance": 0.001,
+        "converged": true,
+        "screen_weight": 0.015,
+        "boundary_policy": "fixed original values outside the write mask; real image edges only"
+      },
+      "matching_guide": "harmonic colours plus locally consistent or bilaterally observed-edge-supported weak initial continuation; never a donor",
+      "initial_matching_pixels_retained": 4291,
+      "initial_matching_pixels_replaced": 6914,
+      "initial_consistency_rule": "at least 12 clean samples; max RGB deviation <= max(12, 2.5*local original RGB sigma), with 2px rejection guard",
+      "guide_solver": {
+        "iterations": 126,
+        "rms_residual": 0.0009447995116174698,
+        "channel_rms_residual": [
+          0.0009551394661502177,
+          0.0009153719876884977,
+          0.0009631931664081212
+        ],
+        "rms_tolerance": 0.001,
+        "converged": true,
+        "screen_weight": 0.0,
+        "boundary_policy": "fixed original values outside the write mask; real image edges only"
+      },
+      "observed_structure": {
+        "proposals": 24,
+        "accepted_segments": 0,
+        "protected_pixels": 0,
+        "observed_edge_pixels": 749,
+        "budget_exceeded": false,
+        "rule": "observed clean gradients on both ends, at least 8 oriented samples per side"
+      },
+      "line_proposal_budget": 128,
+      "observed_edge_pixel_budget": 50000,
+      "initial_role": "weak matching continuation with local background consistency or observed bilateral line support",
+      "needs_review": true,
+      "warnings": [
+        "Original donor estimates may still select inappropriate texture, and overlapping consensus can soften fine detail.",
+        "The input selection must cover the watermark; unselected remnants remain unchanged.",
+        "Hidden original content is unknown; inspect the result before accepting it.",
+        "Some donor matches are weak; copied texture may be inappropriate.",
+        "Source-excluded pixels preserved outside the write mask constrain the Poisson boundary; protected watermark colors can influence adjacent repairs."
+      ],
+      "outside_write_mask_changed_pixels": 0,
+      "elapsed_seconds": 3.6548,
+      "accuracy_against_original": null
+    }
+  },
+  "independent_use": {
+    "initial_scope": "A separate user-flow run started with only the Skill and original photo; independently chose ROI 1248,1955,1516,2029.",
+    "initial_issue": "A thin right outline remnant needed a manually corrected mask. This prompted the bounded contour-continuation fix.",
+    "final_scope": "Controlled replay of the same independently selected first-run ROI on final code; no handmade write mask or manual source exclusion.",
+    "final_validation": {
+      "replay_kind": "Controlled replay of independently selected first-run parameters, not a new blind-from-scratch test.",
+      "command": "/root/.cache/remove-visible-watermark/py312-e4fa6138b6/bin/python /root/.codex/skills/remote-skills/skill-6ac608c4d18481918fb46df113ad3ca2/scripts/run.py --input /workspace/scratch/6f0d78dcae86/upload/image(2).png --output /workspace/scratch/6f0d78dcae86/watermark_v13/independent_use/final_automatic.png --text-roi 1248,1955,1516,2029 --method exemplar --refine consensus --strict-classical",
+      "input_size": [
+        1536,
+        2048
+      ],
+      "output_size": [
+        1536,
+        2048
+      ],
+      "input_mode": "RGBA",
+      "output_mode": "RGBA",
+      "input_sha256_current": "fbe88e201dfec22d85ae8c3486f4e54e0233a01eae4a5377070bf3ee546d36bf",
+      "input_sha256_matches_original_first_run": true,
+      "output_sha256_current": "f4860b1b2430e12ec77e4952cd35962a3c022a543c69355afae2495791a95255",
+      "changed_pixels": 10909,
+      "allowed_selection_pixels": 10929,
+      "changed_percent_total_pixels": 0.34678777058919275,
+      "outside_selection_changed_pixels": 0,
+      "outside_original_text_roi_changed_pixels": 0,
+      "alpha_changed_pixels": 0,
+      "changed_bbox_xyxy_exclusive": [
+        1261,
+        1961,
+        1505,
+        2021
+      ],
+      "normal_content_pixels_outside_original_text_roi_unchanged": true,
+      "first_automatic_selection_pixels": 10895,
+      "automatic_selection_added_pixels_vs_first_run": 34,
+      "automatic_selection_removed_pixels_vs_first_run": 0,
+      "previous_remnant_core_definition": "Pixels unselected by attempt1 inside the visually inspected remnant box, with original mean RGB below 218. Defined before replay; used only for inspection metrics, never as a repair mask.",
+      "previous_remnant_core_pixels": 11,
+      "previous_remnant_core_selected_now": 11,
+      "previous_remnant_core_changed_now": 11,
+      "previous_remnant_core_mean_rgb_original": 197.8181818181818,
+      "previous_remnant_core_mean_rgb_output": 224.0,
+      "previous_remnant_core_pixels_xy": [
+        [
+          1498,
+          2000
+        ],
+        [
+          1499,
+          2000
+        ],
+        [
+          1498,
+          2001
+        ],
+        [
+          1499,
+          2001
+        ],
+        [
+          1500,
+          2001
+        ],
+        [
+          1500,
+          2002
+        ],
+        [
+          1501,
+          2002
+        ],
+        [
+          1501,
+          2003
+        ],
+        [
+          1502,
+          2003
+        ],
+        [
+          1502,
+          2004
+        ],
+        [
+          1503,
+          2004
+        ]
+      ],
+      "manual_repair_mask_used": false,
+      "explicit_source_exclusion_used": false,
+      "report_explicit_source_exclusion": null,
+      "report_text_edge_guard_pixels": 2,
+      "expected_frozen_sha256": {
+        "consensus.py": "972bdaab5891af6cba383acf13effc527b5c84bed1726252709b4fb37aea413e",
+        "text_mask.py": "3b4cd5515f397a052a6a21ab290a5cc9002734dc13dcd26434860f500baf9805"
+      },
+      "actual_script_sha256_before": {
+        "consensus.py": "972bdaab5891af6cba383acf13effc527b5c84bed1726252709b4fb37aea413e",
+        "text_mask.py": "3b4cd5515f397a052a6a21ab290a5cc9002734dc13dcd26434860f500baf9805",
+        "core.py": "d9a65463490ba188b1ee59f9f97f18e37acfb1c7392bb46948e02a8d32510186"
+      },
+      "actual_script_sha256_after": {
+        "consensus.py": "972bdaab5891af6cba383acf13effc527b5c84bed1726252709b4fb37aea413e",
+        "text_mask.py": "3b4cd5515f397a052a6a21ab290a5cc9002734dc13dcd26434860f500baf9805",
+        "core.py": "d9a65463490ba188b1ee59f9f97f18e37acfb1c7392bb46948e02a8d32510186"
+      },
+      "frozen_expected_hashes_match_after": true,
+      "script_hashes_unchanged_during_run": true,
+      "report_status": "needs_review",
+      "report_timings_ms": {
+        "detection": 17.084432998672128,
+        "restoration": 5691.844953998952,
+        "total_before_report": 7540.432705998683
+      },
+      "scope_only_note": "Pixel scope and remnant-core selection coverage do not measure hidden-background restoration accuracy."
+    },
+    "selection_pixels": 10929,
+    "result_review": "最终冻结版本受控重放检查\n测试性质：这是“独立首轮参数的受控重放”，不是新一轮从零盲测。\n\n结论：本样例通过受控重放检查；原独立首轮遗漏的“成”字右侧暗描边已由自动选择区覆盖，最终局部没有再出现该残片。本次只执行一次完整默认流程，没有人工补画掩膜，没有人工来源排除，也没有继续调参。\n\n输入：/workspace/scratch/6f0d78dcae86/upload/image(2).png\n最终处理图：/workspace/scratch/6f0d78dcae86/watermark_v13/independent_use/final_automatic.png\n保持原始独立首轮ROI：1248,1955,1516,2029\n方法：exemplar --refine consensus --strict-classical；quality 使用默认 balanced。\n解释器：/root/.cache/remove-visible-watermark/py312-e4fa6138b6/bin/python；bootstrap --check-only 返回 ready。\n\n冻结源码核对：\nconsensus.py SHA256=972bdaab5891af6cba383acf13effc527b5c84bed1726252709b4fb37aea413e\n此处修复核心指 scripts/consensus.py。共享IO文件 core.py 为 d9a65463490ba188b1ee59f9f97f18e37acfb1c7392bb46948e02a8d32510186。\ntext_mask.py SHA256=3b4cd5515f397a052a6a21ab290a5cc9002734dc13dcd26434860f500baf9805\n上述文件运行前后哈希完全一致，冻结修复核心和检测文件均匹配指定哈希。\n\n已检查：最终全图、380×230原尺寸右下角、3倍整段对比、旧残片位置10倍细节、最终selection预览及详细报告。\n\n自动选择区结果：\n旧首轮选择10895像素；最终自动选择10929像素，新增34、移除0；写入边界保持[1261,1961,1505,2021]（右下不包含）。\n运行前已在旧残片观察框[1496,1999,1504,2005]内定义11个暗核心像素：旧首轮未选择且原图mean(RGB)<218。这些点只用于检查，不作为修复掩膜。最终11/11被自动选择，11/11发生修复变化。\n检测报告含 outline_continuation_pixels=57；这是算法中间统计，与最终净新增选择像素34不是同一指标。\n\n视觉判断：\n最终没有看到可读水印、之前的小暗钩或其他独立暗描边残片。没有看到毛衣、藤椅或其他异材质被复制进桌面。原尺寸整体中人物、广告文案、标志、杯身图案、桌沿和椅背保持正常。\n修补区域的细木纹仍比邻近部分略平滑，放大可看出柔化及轻微色调起伏；未见明显硬接缝或成片异色块。该结果可接受，但属于近似纹理修补，不能称为真实背景的无损恢复。\n\n独立像素验证：\n原图/输出尺寸：1536×2048；模式RGBA。\ninput_unchanged=true；输入SHA256与原独立首轮完全一致。\nallowed_selection_pixels=10929\nchanged_pixels=10909，占全图0.34678777058919275%。\noutside_selection_changed_pixels=0\noutside_original_text_roi_changed_pixels=0\nalpha_changed_pixels=0\nnormal_content_pixels_outside_original_text_roi_unchanged=true\noutput_sha256=f4860b1b2430e12ec77e4952cd35962a3c022a543c69355afae2495791a95255\n\n流程耗时：报告总耗时约7.540秒，其中检测约17毫秒，修复约5.692秒。\n报告仍为 needs_review；没有无水印真值，以上像素范围和残片覆盖指标均不代表隐藏背景恢复准确率。\n\n产物：\nfinal_automatic.png\nfinal_automatic.selection-preview.png\nfinal_automatic.comparison.png\nfinal_automatic.report.json\nfinal_automatic.selection.png\nfinal_automatic.mask.png\nfinal_automatic-corner.png\nfinal-controlled-replay-comparison-3x.png\nfinal-previous-remnant-detail-10x.png\nfinal-replay-preflight.json\nfinal-pixel-validation.json\nfinal-review.txt\n\n过程边界：只阅读更新SKILL、指定源码哈希、原始附件及本agent自己的independent_use产物；未读取其他测试目录，未改canonical源码，未操作Git，未做外部保存。\n"
+  },
+  "quality_benchmark": {
+    "version": "1.3.0",
+    "date": "2026-10-07",
+    "scope": "Four fixed exact-mask quality examples, not an automatic detection or universal quality benchmark.",
+    "baseline_version": "1.2.0",
+    "same_inputs_masks_parameters": true,
+    "native_photo_note": "Two clean native crops from the original 1536x2048 image, 340x112 and 206x56; no background resizing. Synthetic watermark pixels are selected exactly.",
+    "metrics_note": {
+      "unit": "8-bit RGB units; arithmetic mean over channels.",
+      "mask_mae": "Mean absolute RGB error against known clean truth inside the exact contamination mask.",
+      "gradient_mae": "Mean absolute error of forward RGB x/y differences on every edge touching the mask.",
+      "inner_boundary_mae": "RGB MAE on the one-pixel inner mask boundary (4-neighbor erosion).",
+      "boundary_crossing_gradient_mae": "Gradient error on edges with exactly one masked endpoint.",
+      "texture_hp_rms": "RMS of Rec.709-luma minus Gaussian(sigma=1) inside the mask; a diagnostic only. A ratio near 1 does not establish texture phase or truth recovery.",
+      "scope": "Output versus original marked pixels outside the mask. Zero proves scope, not restoration quality.",
+      "limitation": "Small fixed backgrounds and known exact masks; this is a quality comparison, not a representative dataset or text-mask segmentation test."
+    },
+    "source_hashes": {
+      "restore.py": "b2e7b8669c5832e326d8349d4cf8bea5d58d8d7b8ce37283062b08d57eb5244a",
+      "patch_inpaint.py": "ea547092f44d3e9f76eddab56b4b79cf29364808660351db9687c887ea10407a",
+      "consensus.py": "972bdaab5891af6cba383acf13effc527b5c84bed1726252709b4fb37aea413e"
+    },
+    "comparison": [
+      {
+        "case": "01_native_table_edge",
+        "method": "exemplar",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 6.9445614035087715,
+          "gradient_mae": 4.115205843293492,
+          "inner_boundary_mae": 4.1075949367088604,
+          "boundary_crossing_gradient_mae": 3.9598765432098766,
+          "texture_hp_rms": 6.063237258274708,
+          "texture_hp_rms_truth": 5.360702819670159,
+          "texture_hp_rms_ratio": 1.131052673919308,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 6.9445614035087715,
+          "gradient_mae": 4.115205843293492,
+          "inner_boundary_mae": 4.1075949367088604,
+          "boundary_crossing_gradient_mae": 3.9598765432098766,
+          "texture_hp_rms": 6.063237258274708,
+          "texture_hp_rms_truth": 5.360702819670159,
+          "texture_hp_rms_ratio": 1.131052673919308,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.0,
+          "gradient_mae": 0.0,
+          "inner_boundary_mae": 0.0,
+          "boundary_crossing_gradient_mae": 0.0,
+          "texture_hp_rms": 0.0,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": 0.0,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "01_native_table_edge",
+        "method": "consensus",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 5.14,
+          "gradient_mae": 2.913678618857902,
+          "inner_boundary_mae": 2.257383966244726,
+          "boundary_crossing_gradient_mae": 2.140432098765432,
+          "texture_hp_rms": 5.204742112189943,
+          "texture_hp_rms_truth": 5.360702819670159,
+          "texture_hp_rms_ratio": 0.9709066678891534,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 5.595789473684211,
+          "gradient_mae": 2.9754316069057105,
+          "inner_boundary_mae": 2.371308016877637,
+          "boundary_crossing_gradient_mae": 2.2330246913580245,
+          "texture_hp_rms": 5.221261621497024,
+          "texture_hp_rms_truth": 5.360702819670159,
+          "texture_hp_rms_ratio": 0.9739882618261396,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.4557894736842112,
+          "gradient_mae": 0.06175298804780871,
+          "inner_boundary_mae": 0.11392405063291111,
+          "boundary_crossing_gradient_mae": 0.09259259259259256,
+          "texture_hp_rms": 0.016519509307080682,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": 0.00308159393698626,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "02_native_table_grain",
+        "method": "exemplar",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 2.15906432748538,
+          "gradient_mae": 1.7004671613080518,
+          "inner_boundary_mae": 1.6884735202492211,
+          "boundary_crossing_gradient_mae": 1.6461187214611872,
+          "texture_hp_rms": 1.067611823220833,
+          "texture_hp_rms_truth": 0.8901041526346442,
+          "texture_hp_rms_ratio": 1.1994234832640416,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 2.15906432748538,
+          "gradient_mae": 1.7004671613080518,
+          "inner_boundary_mae": 1.6884735202492211,
+          "boundary_crossing_gradient_mae": 1.6461187214611872,
+          "texture_hp_rms": 1.067611823220833,
+          "texture_hp_rms_truth": 0.8901041526346442,
+          "texture_hp_rms_ratio": 1.1994234832640416,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.0,
+          "gradient_mae": 0.0,
+          "inner_boundary_mae": 0.0,
+          "boundary_crossing_gradient_mae": 0.0,
+          "texture_hp_rms": 0.0,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": 0.0,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "02_native_table_grain",
+        "method": "consensus",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 1.760233918128655,
+          "gradient_mae": 1.1898873316845286,
+          "inner_boundary_mae": 1.205607476635514,
+          "boundary_crossing_gradient_mae": 1.1255707762557077,
+          "texture_hp_rms": 0.4611724609424956,
+          "texture_hp_rms_truth": 0.8901041526346442,
+          "texture_hp_rms_ratio": 0.5181106723044245,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 1.8333333333333333,
+          "gradient_mae": 1.2091233855454795,
+          "inner_boundary_mae": 1.3862928348909658,
+          "boundary_crossing_gradient_mae": 1.2831050228310503,
+          "texture_hp_rms": 0.55721455139845,
+          "texture_hp_rms_truth": 0.8901041526346442,
+          "texture_hp_rms_ratio": 0.6260105064661647,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.07309941520467822,
+          "gradient_mae": 0.01923605386095084,
+          "inner_boundary_mae": 0.18068535825545173,
+          "boundary_crossing_gradient_mae": 0.15753424657534265,
+          "texture_hp_rms": 0.09604209045595441,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": 0.1078998341617402,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "03_synthetic_slant_fine",
+        "method": "exemplar",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 1.2223152022315202,
+          "gradient_mae": 1.059378686590641,
+          "inner_boundary_mae": 1.168141592920354,
+          "boundary_crossing_gradient_mae": 1.0631808278867103,
+          "texture_hp_rms": 4.591630531767055,
+          "texture_hp_rms_truth": 4.387526158680637,
+          "texture_hp_rms_ratio": 1.0465192378813746,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 1.2223152022315202,
+          "gradient_mae": 1.059378686590641,
+          "inner_boundary_mae": 1.168141592920354,
+          "boundary_crossing_gradient_mae": 1.0631808278867103,
+          "texture_hp_rms": 4.591630531767055,
+          "texture_hp_rms_truth": 4.387526158680637,
+          "texture_hp_rms_ratio": 1.0465192378813746,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.0,
+          "gradient_mae": 0.0,
+          "inner_boundary_mae": 0.0,
+          "boundary_crossing_gradient_mae": 0.0,
+          "texture_hp_rms": 0.0,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": 0.0,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "03_synthetic_slant_fine",
+        "method": "consensus",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 0.7690376569037657,
+          "gradient_mae": 0.6399265958841264,
+          "inner_boundary_mae": 0.5014749262536873,
+          "boundary_crossing_gradient_mae": 0.4651416122004357,
+          "texture_hp_rms": 4.272831383290429,
+          "texture_hp_rms_truth": 4.387526158680637,
+          "texture_hp_rms_ratio": 0.9738588965074803,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 0.7687587168758717,
+          "gradient_mae": 0.708087560623935,
+          "inner_boundary_mae": 0.5294985250737463,
+          "boundary_crossing_gradient_mae": 0.5043572984749455,
+          "texture_hp_rms": 4.11580583038437,
+          "texture_hp_rms_truth": 4.387526158680637,
+          "texture_hp_rms_ratio": 0.9380698100776736,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": -0.0002789400278939702,
+          "gradient_mae": 0.0681609647398086,
+          "inner_boundary_mae": 0.028023598820059004,
+          "boundary_crossing_gradient_mae": 0.039215686274509776,
+          "texture_hp_rms": -0.15702555290605869,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": -0.035789086429806605,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "04_single_clean_source",
+        "method": "exemplar",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 0.5576923076923077,
+          "gradient_mae": 0.5049645390070922,
+          "inner_boundary_mae": 0.5370370370370371,
+          "boundary_crossing_gradient_mae": 0.5061728395061729,
+          "texture_hp_rms": 1.0568987116239992,
+          "texture_hp_rms_truth": 1.014466713461115,
+          "texture_hp_rms_ratio": 1.0418269003801184,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 0.5576923076923077,
+          "gradient_mae": 0.5049645390070922,
+          "inner_boundary_mae": 0.5370370370370371,
+          "boundary_crossing_gradient_mae": 0.5061728395061729,
+          "texture_hp_rms": 1.0568987116239992,
+          "texture_hp_rms_truth": 1.014466713461115,
+          "texture_hp_rms_ratio": 1.0418269003801184,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.0,
+          "gradient_mae": 0.0,
+          "inner_boundary_mae": 0.0,
+          "boundary_crossing_gradient_mae": 0.0,
+          "texture_hp_rms": 0.0,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": 0.0,
+          "outside_mask_changed_pixels": 0
+        }
+      },
+      {
+        "case": "04_single_clean_source",
+        "method": "consensus",
+        "baseline_status": "ok",
+        "candidate_status": "ok",
+        "baseline": {
+          "mask_mae": 0.23076923076923078,
+          "gradient_mae": 0.3375886524822695,
+          "inner_boundary_mae": 0.21296296296296297,
+          "boundary_crossing_gradient_mae": 0.2222222222222222,
+          "texture_hp_rms": 0.9930209592194233,
+          "texture_hp_rms_truth": 1.014466713461115,
+          "texture_hp_rms_ratio": 0.9788600710529733,
+          "outside_mask_changed_pixels": 0
+        },
+        "candidate": {
+          "mask_mae": 0.2467948717948718,
+          "gradient_mae": 0.34893617021276596,
+          "inner_boundary_mae": 0.25925925925925924,
+          "boundary_crossing_gradient_mae": 0.2716049382716049,
+          "texture_hp_rms": 0.9727611677299554,
+          "texture_hp_rms_truth": 1.014466713461115,
+          "texture_hp_rms_ratio": 0.9588891925405119,
+          "outside_mask_changed_pixels": 0
+        },
+        "delta_candidate_minus_baseline": {
+          "mask_mae": 0.016025641025641024,
+          "gradient_mae": 0.01134751773049647,
+          "inner_boundary_mae": 0.04629629629629628,
+          "boundary_crossing_gradient_mae": 0.04938271604938271,
+          "texture_hp_rms": -0.020259791489467993,
+          "texture_hp_rms_truth": 0.0,
+          "texture_hp_rms_ratio": -0.019970878512461487,
+          "outside_mask_changed_pixels": 0
+        }
+      }
+    ],
+    "review": "All four final refinements improve over exemplar initialization on masked MAE. Compared with v1.2 consensus, three MAEs increase and one is effectively unchanged; all gradient and boundary errors increase. Native grain remains softened. These tradeoffs are retained rather than relabeled as accuracy gains.",
+    "native_grain_high_frequency_ratio_v12_to_v13": [
+      0.5181106723044245,
+      0.6260105064661647
+    ],
+    "rejected_internal_candidate": "A hard donor-winner candidate caused a visibly interrupted native table edge and higher errors. It was withdrawn; final code uses observed-structure protection and overlapping means."
+  },
+  "source_hashes": {
+    "scripts/bootstrap.py": "9a1f4d53fa83cc6c5a43c1a59890ed58dca90915117aa482ec67fc2676230f49",
+    "scripts/consensus.py": "972bdaab5891af6cba383acf13effc527b5c84bed1726252709b4fb37aea413e",
+    "scripts/core.py": "d9a65463490ba188b1ee59f9f97f18e37acfb1c7392bb46948e02a8d32510186",
+    "scripts/detect.py": "4102ce435d0e06cf9569a0068e37dd4a2f2612e0147d4417e5742204655a2123",
+    "scripts/patch_inpaint.py": "ea547092f44d3e9f76eddab56b4b79cf29364808660351db9687c887ea10407a",
+    "scripts/restore.py": "b2e7b8669c5832e326d8349d4cf8bea5d58d8d7b8ce37283062b08d57eb5244a",
+    "scripts/run.py": "e372af2f4a1c0fc58ca2f7972faf286d8cc8f25e4874389a9eded0ce233d1d6d",
+    "scripts/selftest.py": "baa4def671bff77827210aa4ab9c28a36aa9fdaa79596afba3c7ca0abfa913ed",
+    "scripts/text_mask.py": "3b4cd5515f397a052a6a21ab290a5cc9002734dc13dcd26434860f500baf9805"
+  },
+  "history": [
+    {
+      "version": "1.2.0",
+      "date": "2026-10-07",
+      "scope": "Targeted detail fixes with small fixed quality examples; independent use also exposed unresolved ROI sensitivity and donor-support failure. No universal quality claim.",
+      "regression": {
+        "environment": {
+          "python": "3.12.14",
+          "platform": "linux",
+          "numpy": "2.5.3",
+          "pillow": "12.3.0",
+          "opencv": "4.11.0"
+        },
+        "counts": {
+          "passed": 22,
+          "failed": 0,
+          "total": 22
+        },
+        "status": "passed",
+        "duration_seconds": 14.6722,
+        "cases": [
+          {
+            "id": "telea_rgb_mask_boundaries_and_preview",
+            "status": "passed"
+          },
+          {
+            "id": "ns_rgb_mask_boundaries_and_no_preview",
+            "status": "passed"
+          },
+          {
+            "id": "rgba_alpha_and_protect_mask",
+            "status": "passed"
+          },
+          {
+            "id": "flat_background_synthetic_truth",
+            "status": "passed"
+          },
+          {
+            "id": "shifted_builtin_template_inverse_regression",
+            "status": "passed"
+          },
+          {
+            "id": "no_match_is_skipped",
+            "status": "passed"
+          },
+          {
+            "id": "input_overwrite_is_always_rejected",
+            "status": "passed"
+          },
+          {
+            "id": "wrong_size_mask_has_clear_error",
+            "status": "passed"
+          },
+          {
+            "id": "nonfinite_radius_has_clear_error",
+            "status": "passed"
+          },
+          {
+            "id": "nonfinite_profile_number_has_clear_error",
+            "status": "passed"
+          },
+          {
+            "id": "opaque_alpha_template_is_rejected",
+            "status": "passed"
+          },
+          {
+            "id": "batch_same_stem_outputs_do_not_collide",
+            "status": "passed"
+          },
+          {
+            "id": "batch_mixed_error_is_reported",
+            "status": "passed"
+          },
+          {
+            "id": "text_roi_builds_stroke_mask_and_auto_uses_exemplar",
+            "status": "passed"
+          },
+          {
+            "id": "text_descender_and_dark_outline_tails_are_covered",
+            "status": "passed"
+          },
+          {
+            "id": "text_morphology_preserves_unmarked_high_contrast_object",
+            "status": "passed"
+          },
+          {
+            "id": "exemplar_protected_watermark_is_excluded_from_donors",
+            "status": "passed"
+          },
+          {
+            "id": "selection_and_selection_preview_artifacts",
+            "status": "passed"
+          },
+          {
+            "id": "consensus_refinement_cli_scope_and_explicit_method",
+            "status": "passed"
+          },
+          {
+            "id": "explicit_source_exclusion_preserves_selection_and_blocks_donor_influence",
+            "status": "passed"
+          },
+          {
+            "id": "invalid_text_roi_and_quality_have_clear_errors",
+            "status": "passed"
+          },
+          {
+            "id": "unlettered_text_roi_is_not_rectangularly_erased",
+            "status": "passed"
+          }
+        ]
+      },
+      "quality_benchmark": {
+        "sample_count": 4,
+        "same_mask_and_fixed_defaults": true,
+        "metric_definitions": {
+          "masked_rgb_mae_0_255": "Mean absolute RGB error across all three channels at mask==True, against clean truth. Lower is better.",
+          "local_gradient_mae": "Convert RGB uint8 to gray then float32; Sobel ksize=3 / 8 in x and y; average absolute error of those two components over mask dilated by one pixel. Matches original quality_lab evaluator. Lower is better.",
+          "gradient_energy_ratio_on_mask": "RMS gradient magnitude(output)/RMS gradient magnitude(truth), on mask. Descriptive only; near 1 does not prove correct texture.",
+          "inner_mask_boundary_rgb_mae_0_255": "RGB MAE on the one-pixel inner boundary of the exact mask. Lower is better.",
+          "seconds": "Single observed time.perf_counter elapsed; method call only. Refine increment excludes initial fill; end-to-end includes initial plus refinement. Not a statistically stable speed benchmark.",
+          "alpha": "Both algorithms accept only RGB. Original alpha is reattached by the comparison caller; alpha stability is a pipeline check, not native RGBA support in either function."
+        },
+        "photo_case_note": "Recreated exactly one existing benchmark photo case: original crop [x=95:700,y=1920:1970] resized to 512x256 with INTER_LINEAR, then synthetic TEST 01 watermark. Cropping/resizing limits realism; this is not an untouched native-resolution photo benchmark.",
+        "source_hashes": {
+          "patch": "ea547092f44d3e9f76eddab56b4b79cf29364808660351db9687c887ea10407a",
+          "refine": "b2011a1c8546dee1898aa05141d9b93ff00cee2d88e47c9b040d3eabaab56f80"
+        },
+        "cases": [
+          {
+            "id": "01_gradient",
+            "kind": "smooth nonlinear color gradient",
+            "mask_pixels": 4308,
+            "image_size_wh": [
+              420,
+              280
+            ],
+            "input_sha256": {
+              "clean_rgba": "f185eb03dfdce5a50c66b43a04fcf3f09f97b04d70c1da612ec0ac18ca11d547",
+              "marked_rgba": "9a07d143f5a333b91e3f2eb50ebc15b3b96dc276bac2f680e4b9b939d9b99495",
+              "mask_bool": "58c8a821744d106ff765f28277793751b07b2ce46f2fe2974828138ec43d35b7"
+            },
+            "initial": {
+              "masked_rgb_mae_0_255": 0.01454657968133688,
+              "local_gradient_mae": 0.012764574959874153,
+              "inner_mask_boundary_rgb_mae_0_255": 0.010915197432041168,
+              "masked_pixel_p95_max_channel_error": 0.0,
+              "gradient_energy_ratio_on_mask": 1.001455307006836,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refined": {
+              "masked_rgb_mae_0_255": 0.014469204470515251,
+              "local_gradient_mae": 0.011372075416147709,
+              "inner_mask_boundary_rgb_mae_0_255": 0.013154212385416031,
+              "masked_pixel_p95_max_channel_error": 0.0,
+              "gradient_energy_ratio_on_mask": 1.0015361309051514,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refinement_seconds": 2.4795424719995935,
+            "total_algorithm_seconds": 3.68857475799814,
+            "solver": {
+              "iterations": 15,
+              "rms_residual": 0.0009671314131840144,
+              "channel_rms_residual": [
+                0.0009701019576715856,
+                0.0009791177811079752,
+                0.0009519769291016858
+              ],
+              "rms_tolerance": 0.001,
+              "converged": true,
+              "screen_weight": 0.015,
+              "boundary_policy": "fixed original values outside the write mask; real image edges only"
+            },
+            "clipped_pixels": 0
+          },
+          {
+            "id": "02_directional_texture",
+            "kind": "directional wood-like periodic texture plus weak correlated noise",
+            "mask_pixels": 4308,
+            "image_size_wh": [
+              420,
+              280
+            ],
+            "input_sha256": {
+              "clean_rgba": "e28ec77de40c57d8c517312ab10988827eeedbe0c5408da85920d11796201fcf",
+              "marked_rgba": "fa7a0e40c31df87f17cd2a0ca3a62a03e80831194f6ea399df2aad8e3f8581b5",
+              "mask_bool": "58c8a821744d106ff765f28277793751b07b2ce46f2fe2974828138ec43d35b7"
+            },
+            "initial": {
+              "masked_rgb_mae_0_255": 0.5638347268104553,
+              "local_gradient_mae": 0.24691329896450043,
+              "inner_mask_boundary_rgb_mae_0_255": 0.5127344131469727,
+              "masked_pixel_p95_max_channel_error": 2.0,
+              "gradient_energy_ratio_on_mask": 1.0020737648010254,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refined": {
+              "masked_rgb_mae_0_255": 0.4176725447177887,
+              "local_gradient_mae": 0.19423040747642517,
+              "inner_mask_boundary_rgb_mae_0_255": 0.3414497673511505,
+              "masked_pixel_p95_max_channel_error": 2.0,
+              "gradient_energy_ratio_on_mask": 0.9944720268249512,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refinement_seconds": 2.335779406999791,
+            "total_algorithm_seconds": 3.511105730998679,
+            "solver": {
+              "iterations": 28,
+              "rms_residual": 0.0009401517171323473,
+              "channel_rms_residual": [
+                0.0009271796437211576,
+                0.0009637988352006241,
+                0.0009290239325311988
+              ],
+              "rms_tolerance": 0.001,
+              "converged": true,
+              "screen_weight": 0.015,
+              "boundary_policy": "fixed original values outside the write mask; real image edges only"
+            },
+            "clipped_pixels": 0
+          },
+          {
+            "id": "03_straight_boundary",
+            "kind": "antialiased slanted straight boundary between two colored regions",
+            "mask_pixels": 4308,
+            "image_size_wh": [
+              420,
+              280
+            ],
+            "input_sha256": {
+              "clean_rgba": "d345d15dbc69590c59164c0b729207b343aee307b9be5c777c25aeacbff39581",
+              "marked_rgba": "8d2d46a272af7a9319cb876385a38f14634a1f8352566f823b87cb3bfeb313ba",
+              "mask_bool": "58c8a821744d106ff765f28277793751b07b2ce46f2fe2974828138ec43d35b7"
+            },
+            "initial": {
+              "masked_rgb_mae_0_255": 0.783348798751831,
+              "local_gradient_mae": 0.2839537560939789,
+              "inner_mask_boundary_rgb_mae_0_255": 0.14861461520195007,
+              "masked_pixel_p95_max_channel_error": 2.0,
+              "gradient_energy_ratio_on_mask": 1.0313975811004639,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refined": {
+              "masked_rgb_mae_0_255": 0.49705973267555237,
+              "local_gradient_mae": 0.1838562935590744,
+              "inner_mask_boundary_rgb_mae_0_255": 0.09095998108386993,
+              "masked_pixel_p95_max_channel_error": 3.0,
+              "gradient_energy_ratio_on_mask": 0.9594855904579163,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refinement_seconds": 2.3426660539989825,
+            "total_algorithm_seconds": 3.4664496110017353,
+            "solver": {
+              "iterations": 41,
+              "rms_residual": 0.0009079288186066456,
+              "channel_rms_residual": [
+                0.0009103359781586044,
+                0.0008705717776420036,
+                0.0009414868059684296
+              ],
+              "rms_tolerance": 0.001,
+              "converged": true,
+              "screen_weight": 0.015,
+              "boundary_policy": "fixed original values outside the write mask; real image edges only"
+            },
+            "clipped_pixels": 0
+          },
+          {
+            "id": "04_real_wood_resized",
+            "kind": "Clean real-photo wood crop, strongly resized before synthetic watermarking",
+            "mask_pixels": 6664,
+            "image_size_wh": [
+              512,
+              256
+            ],
+            "input_sha256": {
+              "clean_rgba": "d2b4abb6456b4245c9a9c58f335f03c98bd9435a3189b610581b4d98521cee9e",
+              "marked_rgba": "12e9dec9debcdf95f527faf8700bbc20dcf075a1cb689d99607ac6e08838d45c",
+              "mask_bool": "4afe2ed63323fb668ec694247706f34009893312fffcc6ed0250fa508402c53d"
+            },
+            "initial": {
+              "masked_rgb_mae_0_255": 3.047468900680542,
+              "local_gradient_mae": 0.940259575843811,
+              "inner_mask_boundary_rgb_mae_0_255": 2.10392165184021,
+              "masked_pixel_p95_max_channel_error": 10.0,
+              "gradient_energy_ratio_on_mask": 1.1726526021957397,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refined": {
+              "masked_rgb_mae_0_255": 1.8633453845977783,
+              "local_gradient_mae": 0.5819602012634277,
+              "inner_mask_boundary_rgb_mae_0_255": 1.0338935852050781,
+              "masked_pixel_p95_max_channel_error": 6.0,
+              "gradient_energy_ratio_on_mask": 0.8860906958580017,
+              "outside_mask_changed_rgb_pixels": 0,
+              "alpha_changed_pixels": 0,
+              "inputs_unchanged": true
+            },
+            "refinement_seconds": 3.85054071599734,
+            "total_algorithm_seconds": 5.642700189997413,
+            "solver": {
+              "iterations": 38,
+              "rms_residual": 0.0009308961307248798,
+              "channel_rms_residual": [
+                0.0009357292792824778,
+                0.0009438948115794299,
+                0.0009127848153659138
+              ],
+              "rms_tolerance": 0.001,
+              "converged": true,
+              "screen_weight": 0.015,
+              "boundary_policy": "fixed original values outside the write mask; real image edges only"
+            },
+            "clipped_pixels": 0
+          }
+        ],
+        "limitations": [
+          "Smooth-gradient average RGB improvement is tiny and should not be marketed as a large gain.",
+          "Smooth-gradient inner-boundary MAE worsened slightly; straight-boundary P95 max-channel error increased from 2 to 3.",
+          "Resized-photo texture energy fell below its clean truth, consistent with observed softening.",
+          "These four exact-mask examples do not measure automatic watermark detection or universal success rate."
+        ]
+      },
+      "user_sample": {
+        "input_filename": "image(2).png",
+        "input_sha256": "fbe88e201dfec22d85ae8c3486f4e54e0233a01eae4a5377070bf3ee546d36bf",
+        "input_size": [
+          1536,
+          2048
+        ],
+        "status": "needs_review",
+        "method": "exemplar",
+        "refinement": "consensus",
+        "text_roi_xyxy": [
+          1258,
+          1956,
+          1510,
+          2023
+        ],
+        "selection_pixels": 11033,
+        "source_exclusion_used": true,
+        "validation": {
+          "output_size": [
+            1536,
+            2048
+          ],
+          "output_mode": "RGBA",
+          "outside_mask_changed_pixels": 0,
+          "outside_mask_max_channel_difference": 0,
+          "alpha_changed_pixels": 0,
+          "input_unchanged": true,
+          "changed_pixels": 11016,
+          "write_mask_pixels": 11016,
+          "write_mask_percent": 0.350189208984375,
+          "output_sha256": "bceeec2b377728c67f4a2c76a00e782ece63bdc341fe756c8a5a0dfa5eb0bed8"
+        },
+        "detail_checks": {
+          "version": "1.2.0",
+          "known_defect_points": [
+            {
+              "label": "tail",
+              "xy": [
+                1464,
+                2018
+              ],
+              "original": [
+                178,
+                166,
+                160
+              ],
+              "v1.1": [
+                178,
+                166,
+                160
+              ],
+              "v1.2": [
+                226,
+                212,
+                206
+              ],
+              "new_selected": true
+            },
+            {
+              "label": "second-tail",
+              "xy": [
+                1478,
+                2018
+              ],
+              "original": [
+                216,
+                206,
+                204
+              ],
+              "v1.1": [
+                216,
+                206,
+                204
+              ],
+              "v1.2": [
+                232,
+                220,
+                218
+              ],
+              "new_selected": true
+            },
+            {
+              "label": "copied-dot",
+              "xy": [
+                1484,
+                2000
+              ],
+              "original": [
+                246,
+                237,
+                234
+              ],
+              "v1.1": [
+                179,
+                167,
+                164
+              ],
+              "v1.2": [
+                234,
+                223,
+                221
+              ],
+              "new_selected": true
+            },
+            {
+              "label": "other-dot",
+              "xy": [
+                1480,
+                1976
+              ],
+              "original": [
+                245,
+                238,
+                236
+              ],
+              "v1.1": [
+                179,
+                167,
+                165
+              ],
+              "v1.2": [
+                230,
+                216,
+                213
+              ],
+              "new_selected": true
+            },
+            {
+              "label": "edge-1",
+              "xy": [
+                1489,
+                1962
+              ],
+              "original": [
+                98,
+                62,
+                54
+              ],
+              "v1.1": [
+                234,
+                225,
+                225
+              ],
+              "v1.2": [
+                98,
+                62,
+                54
+              ],
+              "new_selected": false
+            },
+            {
+              "label": "edge-2",
+              "xy": [
+                1490,
+                1962
+              ],
+              "original": [
+                96,
+                59,
+                52
+              ],
+              "v1.1": [
+                235,
+                226,
+                227
+              ],
+              "v1.2": [
+                96,
+                59,
+                52
+              ],
+              "new_selected": false
+            }
+          ],
+          "table_edge_original_values_preserved": true,
+          "tail_selection_corrected": true,
+          "note": "These checks prove correction of observed mask/edge defects; they are not hidden-background recovery accuracy."
+        },
+        "visual_assessment": "Identified lower-outline remnants, copied dark specks and the selected table-edge bump are removed; patch seams are reduced. Fine grain may remain softened.",
+        "true_original_accuracy": null
+      },
+      "independent_use": {
+        "same_original_input": true,
+        "initial_text_roi_xyxy": [
+          1252,
+          1954,
+          1512,
+          2024
+        ],
+        "initial_visual_result": "failed: scene edge/chair material was selected and copied",
+        "explicit_mask_correction": {
+          "removed_obvious_scene_pixels": 853,
+          "remaining_selection_pixels": 11205
+        },
+        "restricted_donor_consensus": {
+          "status": "error",
+          "reason": "consensus has incomplete color-vote coverage",
+          "output_image_created": false
+        },
+        "restricted_donor_exemplar": {
+          "status": "needs_review",
+          "visual_result": "Visible text removed but block and tonal seams remain; not accepted as the polished delivery"
+        },
+        "withdrawn_experiment": "One smaller 11-pixel support attempt also lacked required gradient coverage; the adaptive change was removed and is not included in this release.",
+        "implication": "Inspect the selection and donor availability. Consensus is optional and cannot reliably finish every constrained mask."
+      },
+      "source_hashes": {
+        "scripts/bootstrap.py": "9a1f4d53fa83cc6c5a43c1a59890ed58dca90915117aa482ec67fc2676230f49",
+        "scripts/consensus.py": "b2011a1c8546dee1898aa05141d9b93ff00cee2d88e47c9b040d3eabaab56f80",
+        "scripts/core.py": "d9a65463490ba188b1ee59f9f97f18e37acfb1c7392bb46948e02a8d32510186",
+        "scripts/detect.py": "4102ce435d0e06cf9569a0068e37dd4a2f2612e0147d4417e5742204655a2123",
+        "scripts/patch_inpaint.py": "ea547092f44d3e9f76eddab56b4b79cf29364808660351db9687c887ea10407a",
+        "scripts/restore.py": "389434d968bbbe001c338360a2b96991c37c9484c7c07f724bb1c542cca64e5c",
+        "scripts/run.py": "2fb07a843ccacdbe538538476993250c3eec6a499dd622257258cd99d6b1fc71",
+        "scripts/selftest.py": "1291409d4ac01de5c9e35fd0c144ca8dd8c40e03583e768627be454df648c719",
+        "scripts/text_mask.py": "85c50b56a2d1f871d1999ae0e1f76022f9071a6bb4316e9e08226ff7ddec1f07"
+      },
+      "history": [
+        {
+          "version": "1.1.0",
+          "date": "2026-10-07",
+          "scope": "Targeted synthetic regression plus limited quality examples; no universal accuracy claim.",
+          "regression": {
+            "environment": {
+              "python": "3.12.14",
+              "platform": "linux",
+              "numpy": "2.5.3",
+              "pillow": "12.3.0",
+              "opencv": "4.11.0"
+            },
+            "status": "passed",
+            "counts": {
+              "passed": 19,
+              "failed": 0,
+              "total": 19
+            },
+            "duration_seconds": 11.8074,
+            "cases": [
+              {
+                "id": "telea_rgb_mask_boundaries_and_preview",
+                "status": "passed"
+              },
+              {
+                "id": "ns_rgb_mask_boundaries_and_no_preview",
+                "status": "passed"
+              },
+              {
+                "id": "rgba_alpha_and_protect_mask",
+                "status": "passed"
+              },
+              {
+                "id": "flat_background_synthetic_truth",
+                "status": "passed"
+              },
+              {
+                "id": "shifted_builtin_template_inverse_regression",
+                "status": "passed"
+              },
+              {
+                "id": "no_match_is_skipped",
+                "status": "passed"
+              },
+              {
+                "id": "input_overwrite_is_always_rejected",
+                "status": "passed"
+              },
+              {
+                "id": "wrong_size_mask_has_clear_error",
+                "status": "passed"
+              },
+              {
+                "id": "nonfinite_radius_has_clear_error",
+                "status": "passed"
+              },
+              {
+                "id": "nonfinite_profile_number_has_clear_error",
+                "status": "passed"
+              },
+              {
+                "id": "opaque_alpha_template_is_rejected",
+                "status": "passed"
+              },
+              {
+                "id": "batch_same_stem_outputs_do_not_collide",
+                "status": "passed"
+              },
+              {
+                "id": "batch_mixed_error_is_reported",
+                "status": "passed"
+              },
+              {
+                "id": "text_roi_builds_stroke_mask_and_auto_uses_exemplar",
+                "status": "passed"
+              },
+              {
+                "id": "exemplar_protected_watermark_is_excluded_from_donors",
+                "status": "passed"
+              },
+              {
+                "id": "selection_and_selection_preview_artifacts",
+                "status": "passed"
+              },
+              {
+                "id": "explicit_source_exclusion_preserves_selection_and_blocks_donor_influence",
+                "status": "passed"
+              },
+              {
+                "id": "invalid_text_roi_and_quality_have_clear_errors",
+                "status": "passed"
+              },
+              {
+                "id": "unlettered_text_roi_is_not_rectangularly_erased",
+                "status": "passed"
+              }
+            ]
+          },
+          "quality_benchmark": {
+            "metric": "Masked RGB MAE on 0..255; lower is better",
+            "cases": [
+              {
+                "id": "01_gradient",
+                "mae": {
+                  "telea": 1.2196688652038574,
+                  "ns": 0.3301609456539154,
+                  "patch": 0.01454657968133688
+                },
+                "outside_mask_changed_pixels": 0,
+                "alpha_changed_pixels": 0
+              },
+              {
+                "id": "02_directional_texture",
+                "mae": {
+                  "telea": 4.477483749389648,
+                  "ns": 4.1171464920043945,
+                  "patch": 0.5638347268104553
+                },
+                "outside_mask_changed_pixels": 0,
+                "alpha_changed_pixels": 0
+              },
+              {
+                "id": "03_straight_boundary",
+                "mae": {
+                  "telea": 4.606004238128662,
+                  "ns": 4.158542156219482,
+                  "patch": 0.783348798751831
+                },
+                "outside_mask_changed_pixels": 0,
+                "alpha_changed_pixels": 0
+              }
+            ],
+            "patch_module_sha256": "808d4bad09564c67fd0c49ef73609a7abed62d765d28e29e27b85b516aa02030",
+            "sample_count": 3,
+            "same_mask_and_fixed_defaults": true
+          },
+          "user_sample": {
+            "input_filename": "image(2).png",
+            "input_size": [
+              1536,
+              2048
+            ],
+            "old_uploaded_output_size": [
+              1440,
+              1920
+            ],
+            "status": "needs_review",
+            "method": "exemplar",
+            "selection_pixels": 10878,
+            "explicit_source_exclusion_used": true,
+            "validation": {
+              "output_size": [
+                1536,
+                2048
+              ],
+              "output_mode": "RGBA",
+              "outside_mask_changed_pixels": 0,
+              "outside_mask_max_channel_difference": 0,
+              "alpha_changed_pixels": 0,
+              "input_unchanged": true,
+              "changed_pixels": 10875,
+              "write_mask_pixels": 10875,
+              "write_mask_percent": 0.3457069396972656,
+              "output_sha256": "0069a58047af184801773a6a320503475f4bb06b833391081e00bf5384c50cdb"
+            },
+            "true_original_accuracy": null,
+            "visual_limit": "Some fine specks and texture seams remain. No clean ground truth was supplied."
+          },
+          "source_hashes": {
+            "scripts/bootstrap.py": "9a1f4d53fa83cc6c5a43c1a59890ed58dca90915117aa482ec67fc2676230f49",
+            "scripts/core.py": "d9a65463490ba188b1ee59f9f97f18e37acfb1c7392bb46948e02a8d32510186",
+            "scripts/detect.py": "4102ce435d0e06cf9569a0068e37dd4a2f2612e0147d4417e5742204655a2123",
+            "scripts/patch_inpaint.py": "808d4bad09564c67fd0c49ef73609a7abed62d765d28e29e27b85b516aa02030",
+            "scripts/restore.py": "288161a63ded6855839a23dee23776d13fe4de73b56a01c8e23fef896022879e",
+            "scripts/run.py": "692175d9ac357738ff58f05d80686d86ce6fc652b1911b2154e86bac36dd1d7a",
+            "scripts/selftest.py": "d68827d011008b01144fa803951cee64b70a22c988f37864d67896b51ce2eef7",
+            "scripts/text_mask.py": "4afed8f9436da7ad83fefa63bf79719f83ad2ab551b09619fd5dda720529c423"
+          }
+        }
+      ]
+    }
+  ]
+}
