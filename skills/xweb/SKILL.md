@@ -1,6 +1,6 @@
 ---
 name: xweb
-version: 1.3.1
+version: 1.3.2
 description: 用 `xweb` CLI 读 X（x.com）—— 不开浏览器、不用 API key：访客态零账号可读资料/时间线/单推/趋势/行情卡；填本人 cookie 后解锁搜索/粉丝/收藏/通知/发推等全站能力。当用户说"不用浏览器看 X""查某人的推""推特搜索""看推特热搜""查股价/行情""把 x.com 接到 Agent/CLI"时使用。本文档是 Agent 操作手册：命令映射、--json 输出、错误解释（404 空 body / Internal server error / 空结果）、写操作安全规则、能力边界。需先安装 xweb（见文末）。
 metadata:
   requires:

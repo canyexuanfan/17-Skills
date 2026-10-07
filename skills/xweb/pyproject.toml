@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xweb"
-version = "1.3.1"
+version = "1.3.2"
 description = "X (x.com) 命令行客户端 —— 不用浏览器、不用 API key：访客态读公开数据，填自己的登录态解锁全站读能力"
 readme = "README.md"
 requires-python = ">=3.9"
