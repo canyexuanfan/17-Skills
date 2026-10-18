@@ -20,10 +20,25 @@
 
 ## 安装
 
-以 gzh-to-ima 为例，把整个目录复制进 Agent 的 skills 根目录：
+**一键安装（推荐）**——交互选择 Skill 并复制进你的 Agent 技能目录：
+
+```powershell
+# Windows PowerShell
+./install.ps1
+```
+
+```bash
+# Linux / macOS / Git Bash
+./install.sh
+```
+
+也支持非交互：`./install.ps1 -Skill xweb -Target C:\path	ogent\skills`、
+`./install.sh xweb --target ~/.claude/skills`、`all` 安装全部。
+
+**手动安装**：把 `skills/<名字>/` 整个目录复制进 Agent 的 skills 根目录即可，例如：
 
 ```text
-skills/
+<你的 agent skills 目录>/
 └── gzh-to-ima/           ← 整目录复制
     ├── wechat-to-ima/
     ├── ima-skill/
