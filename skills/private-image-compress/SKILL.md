@@ -46,7 +46,7 @@ agent_created: true
    ```bash
    python "{skill目录}/scripts/privacy_server.py"
    ```
-   服务启动后自动打开浏览器页面（Windows 用户也可直接双击 `scripts/start_privacy.bat`）。
+   服务启动后自动打开浏览器页面（Windows 半懂用户也可直接双击 Skill 根目录的 `start-privacy.bat`，零 Token 自助使用，无需 AI 参与）。
 4. **告知用户**：「工具已在浏览器打开，请自行拖入图片或点击虚线框选择，设置大小/尺寸限制后点开始压缩，结果会自动写回原图所在文件夹。处理完告诉我，我帮你关掉服务。」
 5. **边界**：不要代替用户操作页面；不要模拟请求处理用户未明确要求的图；用户确认完成后关闭后台服务进程。
 
@@ -94,7 +94,7 @@ python "{skill目录}/scripts/compress_image.py" \
 ## 注意事项
 
 - 本工具为本地服务，仅监听 127.0.0.1，无任何外部网络请求。
-- Windows 用户可用 `scripts/start_privacy.bat` 一键启动（自动检测 Python 并安装 Pillow）；macOS/Linux 用户按上面步骤手动启动。
+- Windows 用户可用根目录 `start-privacy.bat` 一键启动（自动检测 Python 并安装 Pillow）；macOS/Linux 用户按上面步骤手动启动。
 - 长内联 Python 命令可能被执行沙箱拒绝时，改为调用脚本文件或写临时脚本执行。
 - 路径含中文/空格时全部加双引号。
 
@@ -102,4 +102,4 @@ python "{skill目录}/scripts/compress_image.py" \
 
 - `scripts/compress_image.py`：Agent 模式压缩脚本（二分质量搜索 + 分辨率-质量平衡 + PNG 调色板），直接执行。
 - `scripts/privacy_server.py` + `scripts/privacy_index.html`：隐私模式本地服务 + 网页界面，原样使用。
-- `scripts/start_privacy.bat`：Windows 一键启动（自动检测环境）。
+- `start-privacy.bat`（根目录）：Windows 一键启动（自动检测环境）。

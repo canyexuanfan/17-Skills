@@ -54,15 +54,16 @@ private-image-compress/
 ├── CHANGELOG.md              # 版本记录
 ├── VALIDATION.md             # 实测校验记录
 ├── requirements.txt          # Python 依赖（Pillow）
+├── start-privacy.bat         # Windows 一键启动（双击即用）
 └── scripts/
     ├── compress_image.py     # Agent 模式压缩脚本
     ├── privacy_server.py     # 隐私模式本地服务
     ├── privacy_index.html    # 隐私模式网页界面
-    └── start_privacy.bat     # Windows 一键启动
+    └── ...                  # 脚本目录（一键启动器已提升至根目录）
 ```
 
 ## 快速开始
 
-**隐私模式（Windows）**：双击 `scripts/start_privacy.bat` → 浏览器自动打开 → 拖入图片或点击虚线框选择 → 设置参数 → 开始压缩。macOS/Linux：`python scripts/privacy_server.py`。
+**隐私模式（Windows）**：双击根目录 `start-privacy.bat` → 浏览器自动打开 → 拖入图片或点击虚线框选择 → 设置参数 → 开始压缩。macOS/Linux：`python scripts/privacy_server.py`。
 
 **Agent 模式**：安装本技能后直接对 AI 说「把这张图压到 100KB 以内」「改成 512×512 并压到 500KB」，AI 会自动完成并写回原图文件夹。
