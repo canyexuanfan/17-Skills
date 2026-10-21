@@ -17,6 +17,7 @@
 | [xweb](skills/xweb/) | X（x.com）命令行客户端：访客态零账号读公开数据，填自己 cookie 解锁全站读能力；预编译签名模块随包分发 | Apache-2.0 |
 | [remove-visible-watermark](skills/remove-visible-watermark/) | 图片去可见水印（纯传统算法）：文字描边掩膜、纹理修复、结构引导融合、WorkBuddy 角标模板反算，不用生成式 AI、全程本地离线 | MIT |
 | [wechat-sticker-pack](skills/wechat-sticker-pack/) | 微信表情包整理打包：图片/视频素材转微信表情开放平台规范格式（静态 PNG/动态 GIF + 横幅/封面/图标），自带规范校验器 | MIT |
+| [private-image-compress](skills/private-image-compress/) | 隐私图片压缩：图片全程不离开本机（127.0.0.1 本地网页工具），不经过 AI 对话与外部服务器，零上传零记录，按平台限额自动寻优 | MIT |
 
 ## 安装
 
@@ -32,7 +33,7 @@
 ./install.sh
 ```
 
-也支持非交互：`./install.ps1 -Skill xweb -Target C:\path	ogent\skills`、
+也支持非交互：`./install.ps1 -Skill xweb -Target "\\path\\to\\agent\\skills"`、
 `./install.sh xweb --target ~/.claude/skills`、`all` 安装全部。
 
 **手动安装**：把 `skills/<名字>/` 整个目录复制进 Agent 的 skills 根目录即可，例如：
@@ -50,5 +51,5 @@
 ## 许可 · License
 
 - 合集骨架（根 README / CI / .gitignore）：[MIT](LICENSE)
-- 各 Skill 保留原始许可：gzh-to-ima 为 [MIT](skills/gzh-to-ima/LICENSE)，breakout-cli-login 为 [AGPL-3.0](skills/breakout-cli-login/LICENSE)，image-copyright-watermark、image-to-prompt、remove-visible-watermark 与 wechat-sticker-pack 为 [MIT](skills/image-copyright-watermark/LICENSE)，xweb 为 [Apache-2.0](skills/xweb/LICENSE)
-- 收录历史：gzh-to-ima 与 breakout-cli-login 由同名原仓库 subtree 迁入（提交历史完整保留），原仓库已归档并指向本仓库；image-copyright-watermark、image-to-prompt、xweb、remove-visible-watermark、wechat-sticker-pack 为本仓库首发
+- 各 Skill 保留原始许可：gzh-to-ima 为 [MIT](skills/gzh-to-ima/LICENSE)，breakout-cli-login 为 [AGPL-3.0](skills/breakout-cli-login/LICENSE)，image-copyright-watermark、image-to-prompt、remove-visible-watermark、wechat-sticker-pack 与 private-image-compress 为 [MIT](skills/image-copyright-watermark/LICENSE)，xweb 为 [Apache-2.0](skills/xweb/LICENSE)
+- 收录历史：gzh-to-ima 与 breakout-cli-login 由同名原仓库 subtree 迁入（提交历史完整保留），原仓库已归档并指向本仓库；image-copyright-watermark、image-to-prompt、xweb、remove-visible-watermark、wechat-sticker-pack、private-image-compress 为本仓库首发

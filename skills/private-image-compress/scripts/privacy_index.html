@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图片压缩器 · 本地版</title>
+<style>
+  :root {
+    --bg: #f5f7fa; --card: #ffffff; --border: #e4e8ee;
+    --text: #1a2233; --muted: #6b7688; --primary: #2f6fed;
+    --primary-dark: #1e5cd6; --ok: #16a34a; --err: #dc2626; --warn: #b45309;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    display: flex; justify-content: center; padding: 32px 16px;
+  }
+  .wrap { width: 100%; max-width: 860px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(20,30,60,.05);
+  }
+  #dropzone {
+    border: 2px dashed #c3cddd; border-radius: 12px; padding: 30px 16px;
+    text-align: center; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  #dropzone.drag { border-color: var(--primary); background: #eef4ff; color: var(--primary); }
+  #dropzone b { color: var(--primary); }
+  .panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .field label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px; }
+  .field select, .field input {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 14px; background: #fff;
+  }
+  .row2 { display: flex; gap: 8px; align-items: center; }
+  .row2 input { flex: 1; }
+  .row2 span { color: var(--muted); }
+  button.go {
+    width: 100%; margin-top: 16px; padding: 12px; border: none; border-radius: 10px;
+    background: var(--primary); color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background .15s;
+  }
+  button.go:hover { background: var(--primary-dark); }
+  button.go:disabled { background: #9db7f5; cursor: not-allowed; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  #files { margin-top: 12px; max-height: 250px; overflow-y: auto; }
+  .fitem {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    border-bottom: 1px solid #f0f2f5; font-size: 13px;
+  }
+  .fitem .tag {
+    font-size: 11px; padding: 1px 7px; border-radius: 999px; flex-shrink: 0;
+  }
+  .tag.exact { background: #e8f7ee; color: var(--ok); }
+  .tag.drop { background: #fef3e2; color: var(--warn); }
+  .tag.warn { background: #fef3e2; color: var(--warn); }
+  .tag.none { background: #f1f3f6; color: var(--muted); }
+  .fitem .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fitem .sz { margin-left: auto; color: var(--muted); flex-shrink: 0; }
+  .fitem .rm {
+    color: var(--muted); cursor: pointer; border: none; background: none; font-size: 15px;
+  }
+  .fitem .rm:hover { color: var(--err); }
+  .results { margin-top: 6px; }
+  .rrow {
+    display: flex; align-items: center; gap: 10px; padding: 9px 4px;
+    border-bottom: 1px solid #f0f2f5; font-size: 13px;
+  }
+  .rrow .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .badge.ok { background: #e8f7ee; color: var(--ok); }
+  .badge.err { background: #fdeaea; color: var(--err); }
+  .badge.warn { background: #fef3e2; color: var(--warn); }
+  .rrow .out { color: var(--muted); font-size: 12px; flex-shrink: 0; }
+  .rrow button.mini {
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 7px;
+    background: #fff; font-size: 12px; cursor: pointer; flex-shrink: 0;
+  }
+  .status { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .spin {
+    display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #c9d6f5; border-top-color: var(--primary);
+    animation: sp .7s linear infinite; vertical-align: -2px; margin-right: 6px;
+  }
+  @keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🖼️ 图片压缩器</h1>
+  <div class="sub">本地运行 · 图片不会离开你的电脑 · <b>不保存任何记录（无日志、无配置文件）</b> · 压缩结果自动保存到原图所在的文件夹（原图不被覆盖）</div>
+
+  <div class="card">
+    <div id="dropzone">
+      <b>点击选择</b> 或 <b>拖入图片</b>（可多选）<br>
+      <span style="font-size:12px">点击 = 原生选择框，直接定位原图 · 拖入 = 自动按文件名+大小查找原图</span>
+    </div>
+    <div id="files"></div>
+
+    <div class="panel">
+      <div class="field">
+        <label>大小限制</label>
+        <div class="row2">
+          <input type="number" id="maxkb" value="500" min="1" placeholder="不限大小就留空">
+          <span>KB</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>图片格式</label>
+        <select id="fmt">
+          <option value="auto">自动（透明图 PNG，其余 JPEG）</option>
+          <option value="jpeg">JPEG（体积最小）</option>
+          <option value="png">PNG（保留透明）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>尺寸</label>
+        <select id="mode" onchange="sizeModeChanged()">
+          <option value="keep">保持原尺寸</option>
+          <option value="long">限制最长边（等比缩放）</option>
+          <option value="exact">指定宽 × 高</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <div class="row2" id="size-inputs" style="display:none">
+          <input type="number" id="w" placeholder="宽" min="1" style="display:none">
+          <span id="x" style="display:none">×</span>
+          <input type="number" id="h" placeholder="高" min="1" style="display:none">
+          <input type="number" id="long" placeholder="如 1024" min="1" style="display:none">
+          <span id="px">px</span>
+        </div>
+        <div class="row2" id="size-keep"><span style="font-size:13px;color:var(--muted)">不改变图片分辨率</span></div>
+      </div>
+    </div>
+
+    <button class="go" id="btn-go" disabled>开始压缩</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card" id="result-card" style="display:none">
+    <h1 style="font-size:16px">结果</h1>
+    <div class="results" id="results"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let items = [];  // {name, bytes, file:File|null, path:string|null}
+
+/* ---------- add: click zone -> native dialog with real paths ---------- */
+$("dropzone").onclick = async () => {
+  setStatus("请在弹出的窗口中选择图片…", true);
+  const r = await fetch("/api/pick-files", {method: "POST"}).then(r => r.json()).catch(() => ({}));
+  if (r.error) { setStatus(r.error); return; }
+  (r.paths || []).forEach(p => {
+    if (!items.some(i => i.path === p))
+      items.push({name: p.split(/[\\/]/).pop(), bytes: 0, file: null, path: p});
+  });
+  renderFiles(); refreshBtn();
+  setStatus(r.paths && r.paths.length ? `已加入 ${r.paths.length} 张（原图位置已定位）` : "未选择图片");
+};
+
+/* ---------- add: drag ---------- */
+const dz = $("dropzone");
+["dragover", "dragenter"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("drag"); }));
+["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("drag"); }));
+["dragover", "drop"].forEach(ev => document.body.addEventListener(ev, e => e.preventDefault()));
+dz.addEventListener("drop", e => addDrop([...e.dataTransfer.files]));
+document.body.addEventListener("drop", e => addDrop([...e.dataTransfer.files]));
+
+function addDrop(list) {
+  const imgs = list.filter(f => /\.(png|jpe?g|webp|bmp)$/i.test(f.name));
+  let added = 0;
+  imgs.forEach(f => {
+    if (!items.some(i => i.name === f.name && i.bytes === f.size)) {
+      const it = {name: f.name, bytes: f.size, file: f, path: null, loc: "searching"};
+      items.push(it);
+      added++;
+      locate(it);   // 拖入即查原图位置，列表实时更新
+    }
+  });
+  renderFiles(); refreshBtn();
+  setStatus(added ? `已加入 ${added} 张，正在自动查找原图位置…` : "没有识别到新图片");
+}
+
+async function locate(it) {
+  try {
+    const r = await fetch("/api/compress-smart", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({name: it.name, size: it.bytes, locate_only: 1})
+    }).then(r => r.json());
+    if (r.located) {
+      it.loc = r.matched === "size" ? "located" : "name_only";
+      it.src_path = r.src_path;
+    } else {
+      it.loc = "none";
+    }
+  } catch (e) {
+    it.loc = "none";
+  }
+  renderFiles();
+}
+
+function renderFiles() {
+  $("files").innerHTML = items.map((it, i) => {
+    let tag, cls;
+    if (it.path)                     { tag = "已定位"; cls = "exact"; }
+    else if (it.loc === "located")   { tag = "已找到原图"; cls = "exact"; }
+    else if (it.loc === "name_only") { tag = "同名原图"; cls = "warn"; }
+    else if (it.loc === "searching") { tag = "查找中…"; cls = "drop"; }
+    else                             { tag = "未找到原图"; cls = "none"; }
+    return `
+    <div class="fitem">
+      <span class="tag ${cls}">${tag}</span>
+      <span class="nm">${esc(it.name)}</span>
+      <span class="sz">${it.bytes ? fmtKB(it.bytes) : ""}</span>
+      <button class="rm" onclick="items.splice(${i},1);renderFiles();refreshBtn()">✕</button>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- params ---------- */
+function sizeModeChanged() {
+  const m = $("mode").value;
+  $("size-inputs").style.display = m === "keep" ? "none" : "";
+  $("size-keep").style.display = m === "keep" ? "" : "none";
+  const exact = m === "exact";
+  $("w").style.display = exact ? "" : "none";
+  $("x").style.display = exact ? "" : "none";
+  $("h").style.display = exact ? "" : "none";
+  $("long").style.display = m === "long" ? "" : "none";
+  $("px").style.display = m === "keep" ? "none" : "";
+}
+sizeModeChanged();
+
+function params() {
+  return {
+    maxBytes: $("maxkb").value ? Math.round(parseFloat($("maxkb").value) * 1000) : null,
+    mode: $("mode").value,
+    width: +$("w").value || null,
+    height: +$("h").value || null,
+    longSide: +$("long").value || null,
+    format: $("fmt").value,
+  };
+}
+
+function refreshBtn() {
+  $("btn-go").disabled = items.length === 0;
+  $("btn-go").textContent = items.length ? `开始压缩（${items.length} 张）` : "开始压缩";
+}
+
+/* ---------- run ---------- */
+$("btn-go").onclick = async () => {
+  $("btn-go").disabled = true;
+  $("result-card").style.display = "";
+  const p = params();
+  // 已定位到真实路径的（点击选择的 + 拖入且反查成功的）统一走路径压缩
+  const pathItems = items.filter(i => i.path || i.src_path);
+  const dropItems = items.filter(i => !i.path && !i.src_path);
+  let done = 0, total = items.length;
+
+  if (pathItems.length) {
+    setStatus(`压缩中（已定位原图的 ${pathItems.length} 张）…`, true);
+    const r = await fetch("/api/compress-paths", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({paths: pathItems.map(i => i.path || i.src_path), ...p})
+    }).then(r => r.json()).catch(() => ({results: []}));
+    (r.results || []).forEach(rep => {
+      const it = pathItems.find(i => (i.path || i.src_path) === rep.src_path
+                                  || i.name === rep.name);
+      addResult(rep, it);
+      done++;
+    });
+  }
+
+  for (const it of dropItems) {
+    done++;
+    setStatus(`压缩中 ${done}/${total}：${esc(it.name)}（查找原图位置…）`, true);
+    let r = await fetch("/api/compress-smart", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({name: it.name, size: it.bytes, ...p})
+    }).then(r => r.json()).catch(() => ({error: "请求失败"}));
+
+    if (r.located) {   // 拖入反查成功 → 用找到的原图路径压缩
+      const rr = await fetch("/api/compress-paths", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({paths: [r.src_path], ...p})
+      }).then(r => r.json()).catch(() => ({results: []}));
+      const rep = (rr.results && rr.results[0]) || {ok: false, name: it.name, error: "压缩失败"};
+      rep.matched = r.matched;
+      addResult(rep, it);
+      continue;
+    }
+
+    if (r.found === false && it.file) {
+      // no original on disk -> compress uploaded content into last-known folder
+      setStatus(`未找到原图，压缩拖入内容：${esc(it.name)}`, true);
+      const qs = "?name=" + encodeURIComponent(it.name) + "&req=" +
+                 encodeURIComponent(JSON.stringify(p));
+      r = await fetch("/api/upload-fallback" + qs, {method: "POST", body: it.file})
+            .then(r => r.json()).catch(() => ({error: "请求失败"}));
+    }
+    addResult(r, it);
+  }
+
+  setStatus(`完成 ✔ 结果已自动保存到各原图所在的文件夹（文件名带 -compressed，不覆盖原图）`);
+  items = [];
+  renderFiles(); refreshBtn();
+};
+
+function addResult(r, it) {
+  const el = document.createElement("div");
+  el.className = "rrow";
+  const nm = esc((r && (r.name || it && it.name)) || "");
+  if (r && r.ok) {
+    el.innerHTML = `<span class="badge ok">✔</span>
+      <span class="name">${nm} → ${esc(r.out_name || "")}</span>
+      <span class="out">${fmtKB(r.src_size)} → <b>${fmtKB(r.bytes)}</b>
+       · ${r.width}×${r.height}${r.quality ? " · q" + r.quality : ""}
+       · ${esc(r.folder || "")}${r.found === false ? "（未找到原图，已用拖入内容）" : ""}${r.matched === "name" ? "（同名原图，大小不同）" : ""}</span>`;
+  } else if (r && r.need_dir) {
+    el.innerHTML = `<span class="badge warn">⚠</span>
+      <span class="name">${nm}</span>
+      <span class="out">${esc(r.error || "")}</span>`;
+    const btn = document.createElement("button");
+    btn.className = "mini"; btn.textContent = "选择保存位置";
+    btn.onclick = () => pickAndSave(r.name, it);
+    el.appendChild(btn);
+  } else {
+    el.innerHTML = `<span class="badge err">✘</span>
+      <span class="name">${nm}</span>
+      <span class="out" style="color:var(--err)">${esc((r && r.error) || "失败")}</span>`;
+  }
+  $("results").appendChild(el);
+  $("result-card").style.display = "";
+}
+
+async function pickAndSave(name, it) {
+  setStatus("请选择保存位置…", true);
+  const pf = await fetch("/api/pick-folder", {method: "POST"}).then(r => r.json()).catch(() => ({}));
+  if (!pf.dir) { setStatus("未选择文件夹"); return; }
+  const p = params();
+  const qs = "?name=" + encodeURIComponent(name) + "&req=" + encodeURIComponent(JSON.stringify(p));
+  const r = await fetch("/api/upload-fallback" + qs, {method: "POST", body: it.file})
+              .then(r => r.json()).catch(() => ({error: "请求失败"}));
+  addResult(r, it);
+  setStatus("已保存");
+}
+
+function setStatus(msg, busy) {
+  $("status").innerHTML = (busy ? '<span class="spin"></span>' : "") + msg;
+}
+function fmtKB(b) {
+  return b >= 1024 * 1024 ? (b / 1048576).toFixed(2) + " MiB"
+       : b >= 1000 ? (b / 1000).toFixed(1) + " KB" : b + " B";
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+</script>
+</body>
+</html>
