@@ -64,6 +64,10 @@ private-image-compress/
 
 ## 快速开始
 
-**隐私模式（Windows）**：双击根目录 `start-privacy.bat` → 浏览器自动打开 → 拖入图片或点击虚线框选择 → 设置参数 → 开始压缩。macOS/Linux：`python scripts/privacy_server.py`。
+**隐私模式 · 三种入口（任选）**
+
+- **零 Token（Windows 半懂用户）**：双击根目录 `start-privacy.bat` → 浏览器自动打开 → 拖入图片或点击虚线框选择 → 设置参数 → 开始压缩
+- **Agent 代启**：装好本 Skill 后直接对 AI 说「用隐私模式压缩这张图」→ AI 后台启动本地服务并打开页面（不占用对话上下文，不含图片内容），完成后告知 AI 关闭服务；macOS/Linux 同理，服务命令为 `python scripts/privacy_server.py`
+- **手动（macOS/Linux）**：`python scripts/privacy_server.py`
 
 **Agent 模式**：安装本技能后直接对 AI 说「把这张图压到 100KB 以内」「改成 512×512 并压到 500KB」，AI 会自动完成并写回原图文件夹。
