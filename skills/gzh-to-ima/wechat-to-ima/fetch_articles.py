@@ -2,11 +2,22 @@
 """
 微信公众号文章抓取脚本
 ===================
-从一篇公众号文章 URL 提取 __biz，然后抓取该公众号的全部历史文章，
-去重后保存为 JSON（title / link / date）。
+两种模式，先判断目标号是不是你自己的：
 
-用法:
-    python fetch_articles.py --url "https://mp.weixin.qq.com/s/xxxx" --name "公众号名"
+  ① --own（自己的号，推荐）：走后台「发表记录」接口 appmsgpublish
+     —— 不需要 __biz / fakeid，能拿 total_count 做验收，抓到多少一目了然
+         python fetch_articles.py --own --name "我的号"
+
+  ② --url（别人的号，仅老版本兼容）：从文章 URL 提出 __biz，再按 fakeid 抓
+     ⚠️ 微信已关闭「按 fakeid 抓他人全量」的接口 —— 非自己的号一律 200013，
+        这是权限墙不是频控。别人的号请改用 fetch_other_channels.py（合集 + 搜狗），
+        且只能尽量多、不保证全量。
+
+凭证：
+    --token    公众号后台地址栏 ?token= 后面那串数字
+    --cookie   F12 → Application → Cookies → mp.weixin.qq.com → Copy All
+    ⚠️ 凭证约 1~1.5 小时失效（200003 invalid session），
+       若只有 token 失效则是 200040，只换 token 即可。
 
 可选参数:
     --output      输出 JSON 路径 (默认: <name>_全部文章_YYYYMMDD.json)
@@ -44,9 +55,9 @@ except Exception:
     DEFAULT_COOKIE = None
 
 # 兼容三种形态:
-#   URL 参数:  ...?__biz=MzU1MjM1Mjc1Nw==&mid=...
-#   源码变量:  var biz = "MzU1MjM1Mjc1Nw==";
-#   JSON 字段: "biz":"MzU1MjM1Mjc1Nw=="
+#   URL 参数:  ...?__biz=MzA5MTIzNDU2Nzg5MA==&mid=...
+#   源码变量:  var biz = "MzA5MTIzNDU2Nzg5MA==";
+#   JSON 字段: "biz":"MzA5MTIzNDU2Nzg5MA=="
 BIZ_RE = re.compile(r'(?:__)?biz["\']?\s*[=:]\s*["\']?([a-zA-Z0-9+/=]{10,})')
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
@@ -187,9 +198,100 @@ def load_existing(path):
     return []
 
 
+def crawl_own(token, cookie, out_path=None, name="公众号", count=5, sleep_sec=3.5,
+              max_batch=400, state_path=None):
+    """抓「自己管理的公众号」的全部发文（appmsgpublish 通道）。
+
+    为什么和 crawl_all 不同：
+      * 不需要 __biz / fakeid —— 接口凭后台登录态认号，省掉「自己找 biz」这一步
+      * 能拿到 total_count 做验收判据（抓到的篇数对不上就不算完）
+      * 实测 183 篇 / 37 页 / 3.5s 间隔 / 全程无 200013
+    """
+    headers = {
+        "Cookie": cookie,
+        "User-Agent": UA,
+        "Referer": f"https://mp.weixin.qq.com/cgi-bin/home?t=home/index&token={token}&lang=zh_CN",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+    out_path = out_path or f"{name}_全部文章_{datetime.datetime.now():%Y%m%d}.json"
+    articles, seen, total = [], set(), None
+    begin = 0
+    if state_path and os.path.exists(state_path):
+        with open(state_path, encoding="utf-8") as f:
+            st = json.load(f)
+        begin, total = st.get("next_begin", 0), st.get("total_count")
+    if os.path.exists(out_path):
+        with open(out_path, encoding="utf-8") as f:
+            articles = json.load(f)
+        seen = {a["link"] for a in articles}
+
+    for page in range(max_batch):
+        url = (f"https://mp.weixin.qq.com/cgi-bin/appmsgpublish?sub_action=list_ex"
+               f"&begin={begin}&count={count}&token={token}&lang=zh_CN&f=json&ajax=1")
+        try:
+            raw = fetch_url(url, headers)
+            j = json.loads(raw)
+        except Exception as e:
+            log(f"网络/解析错误：{e}")
+            break
+        ret = (j.get("base_resp") or {}).get("ret")
+        msg = (j.get("base_resp") or {}).get("err_msg")
+        if ret == 200013:
+            log(f"⛔ 200013 频控，停。begin={begin}，30~60 分钟后用 --resume 续抓")
+            break
+        if ret == 200003:
+            log("⛔ 200003 invalid session：cookie 过期（约 1~1.5h），重新扫码")
+            break
+        if ret != 0:
+            log(f"⛔ ret={ret} {msg}，停在 begin={begin}")
+            break
+
+        pp = json.loads(j["publish_page"])       # 字符串，需二次解析
+        if total is None:
+            total = pp.get("total_count")
+            log(f"total_count={total}")
+        added = 0
+        for it in pp.get("publish_list") or []:
+            for a in (json.loads(it["publish_info"]).get("appmsgex") or []):
+                link = a.get("link")
+                if not link or link in seen:
+                    continue
+                seen.add(link)
+                ts = a.get("create_time") or 0
+                articles.append({
+                    "title": a.get("title", ""),
+                    "link": link,
+                    "ts": ts,
+                    "date": datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d") if ts else "",
+                    "digest": a.get("digest", ""),
+                })
+                added += 1
+        begin += count
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(articles, f, ensure_ascii=False, indent=1)
+        if state_path:
+            with open(state_path, "w", encoding="utf-8") as f:
+                json.dump({"next_begin": begin, "have": len(articles),
+                           "total_count": total}, f, ensure_ascii=False)
+        log(f"  page{page + 1}: +{added}  累计 {len(articles)}/{total or '?'}")
+        if not (pp.get("publish_list")):
+            break
+        if total and len(articles) >= int(total):
+            log(f"✅ 已覆盖 total_count（{len(articles)}/{total}）")
+            break
+        time.sleep(sleep_sec)
+
+    ok = total is not None and len(articles) == int(total)
+    log(f"\n结果：{len(articles)} 篇 / total_count={total} → {'✅ 对齐' if ok else '⚠️ 未对齐，需续抓'}")
+    log(f"输出：{out_path}")
+    return ok, out_path, articles
+
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--url", required=True, help="公众号文章 URL")
+    p.add_argument("--own", action="store_true",
+                   help="抓「自己管理的公众号」：走 appmsgpublish 通道，不需要 --url/biz，可验收全量")
+    p.add_argument("--url", required=False, help="公众号文章 URL（抓别人号时用，现仅作 biz 来源）")
     p.add_argument("--name", default="公众号", help="公众号名称（用于输出文件名）")
     p.add_argument("--output", default=None, help="输出 JSON 路径")
     p.add_argument("--token", default=None)
@@ -215,6 +317,11 @@ def main():
         log("❌ 缺少 token 或 cookie，请先在 weixin_credentials.py 中补充凭证")
         sys.exit(1)
 
+    if not args.own and not args.url:
+        log("❌ 请给 --own（自己的号）或 --url（别人的号只用于取 biz）。")
+        log("   别人的号已无法抓全量：请改用 fetch_other_channels.py（合集 + 搜狗）")
+        sys.exit(1)
+
     skill_dir = os.path.dirname(os.path.abspath(__file__))
     state_path = args.state or os.path.join(skill_dir, "resume_state.json")
 
@@ -223,6 +330,23 @@ def main():
         "User-Agent": UA,
         "Referer": f"https://mp.weixin.qq.com/cgi-bin/home?token={token}",
     }
+
+    # --own：自己的号走 appmsgpublish（不要 biz、可验收 total_count）
+    if args.own:
+        ok, own_out, own_arts = crawl_own(token, cookie, args.output, args.name,
+                                          count=args.count, state_path=state_path)
+        if args.auto_import and args.kb_id and own_arts:
+            batch_script = os.path.join(skill_dir, "batch_import_to_ima.py")
+            if os.path.exists(batch_script):
+                import subprocess as _sp
+                cmd = [sys.executable, batch_script, "--import-json", own_out,
+                       "--kb-id", args.kb_id]
+                if args.folder_id:
+                    cmd += ["--folder-id", args.folder_id]
+                r = _sp.run(cmd, capture_output=True, text=True, timeout=1800)
+                for line in r.stdout.strip().split("\n"):
+                    log(line)
+        sys.exit(0 if ok else 2)
 
     # 续抓状态
     start_offset = 0

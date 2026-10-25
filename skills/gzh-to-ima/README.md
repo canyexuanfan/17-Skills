@@ -1,6 +1,7 @@
 # gzh-to-ima-skill
 
-> ⚠️ **目前不可用**：微信公众号官方接口已关闭，本 Skill 的抓取链路已失效，暂时无法使用。仓库保留作为存档与参考，若接口恢复或找到替代方案会在此更新。
+> ⚠️ **能力边界（先读这条）**：微信已**关闭「按 fakeid 抓他人公众号全部历史」的后台接口**（非自己的号一律返回 `200013`，属权限墙，换 cookie / 换 IP / 等待都无效）。
+> 因此本 Skill 分两条路：**自己的号**（后台有权限）走 `appmsgpublish` 可拿全量并验收；**别人的号**只能靠「合集 + 搜狗」多渠道**尽可能多**地抓，**不保证是全部文章**。
 >
 > 本 Skill 已收录于 [17-Skills](https://github.com/canyexuanfan/17-Skills) 合集。原仓库 [gzh-to-ima-skill](https://github.com/canyexuanfan/gzh-to-ima-skill) 已归档，历史与 Star 保留，后续更新在本仓库进行。
 
@@ -11,9 +12,9 @@
 
 把**微信公众号文章**批量抓取并导入到 **IMA 知识库**的自动化技能（skill）。
 
-> 给一个公众号文章链接 → 脚本抓取该号全部历史文章（去重）→ 用 IMA OpenAPI 把文章 URL 批量导入指定知识库/文件夹。
+> 给一个公众号文章链接 → **先判断是不是你自己的号**：自己的号抓全量并验收；别人的号走合集/搜狗多渠道尽量多抓（不保证全量）→ 用 IMA OpenAPI 把文章逐条导入指定知识库/文件夹。
 
-**Batch-import WeChat official account articles into an IMA knowledge base** — fetch via `__biz`, dedupe, then `import_urls` through the IMA OpenAPI.
+**Batch-import WeChat official account articles into an IMA knowledge base** — own account: fetch full history via `appmsgpublish` and verify against `total_count`; others' accounts: multi-channel best-effort (albums + Sogou), then per-URL `import_urls` through the IMA OpenAPI.
 
 ---
 
@@ -35,35 +36,58 @@
 
 ## 功能
 
-- 🕷️ **抓取**：从一篇公众号文章 URL 自动提取 `__biz`，循环抓取该号全部历史文章，去重后导出 JSON（含标题/链接/时间）。
-- 🔁 **断点续抓**：支持从断点 `offset` 继续，不重抓已抓过的文章；频控触发会自动退避重试。
+> ⚠️ **先看这条再往下**：本工具**能抓全量的范围只有「你自己管理的公众号」**（你有后台 admin）。
+> 别人的号走多渠道尽量多抓，**不保证全量** —— 微信已关闭「按 fakeid 抓他人全部历史」的后台接口，
+> 非自己的号一律返回 `200013`。详见下方 [能力边界](#能力边界重要)。
+
+- 🕷️ **抓自己管理的号（可验收全量）**：`fetch_articles.py --own` 走后台「发表记录」接口，
+  **不需要 `__biz`**，以 `total_count` 为验收判据（篇数不等就不算抓完）。
+- 🧭 **抓别人的号（多渠道，尽量多）**：`fetch_other_channels.py` 组合**合集(album)** + **搜狗微信搜索**，
+  合并去重并输出渠道分布与时间覆盖。零凭据可用。
+- 🔁 **断点续抓**：支持从断点继续，不重抓已抓过的文章；频控触发自动停止并落盘。
 - 📄 **增量交付**：对比已交付记录，只输出「本次新增且从未发过」的文章清单（Markdown）。
-- 📥 **导入 IMA**：通过 IMA OpenAPI `import_urls` 把文章 URL 批量灌入知识库，每批 10 条。
-- 🚀 **一键全自动**：`--auto-import` 参数让抓取完成后自动导入 IMA 知识库。
+- 📥 **导入 IMA**：经 IMA OpenAPI `import_urls` 写入知识库 —— **单条导入 + 3s 间隔**
+  （实测批量 5 条只成 1 条），并提供 `--check` 验收裸链接率与重复组。
+- 🚀 **一键全自动**：`--auto-import` 让抓取完成后自动导入 IMA。
 - 🎯 **CLI 驱动**：所有脚本都通过命令行参数控制，无需手动编辑代码文件。
 
 ---
 
+## 能力边界（重要）
+
+| 目标号 | 能拿到 | 说明 |
+|:--|:--|:--|
+| **自己管理的号** | **全量历史** | 走后台发表记录接口，`total_count` 可验收 |
+| 别人的号 + 建过合集 | 该合集全部文章 | 免登录、免凭据 |
+| 别人的号（无合集） | 关键词命中的一部分 | 搜狗通道，按相关性排序、非时间线 |
+| 别人的号要全量 | 需微信客户端登录态 | `profile_ext` + `uin/key/pass_ticket`，见配套说明 |
+
+**已失效的做法**：`cgi-bin/appmsg?action=list_ex&fakeid=<别人的biz>` —— 微信关闭了这条权限，
+恒返回 `200013 freq control`。这是权限墙，等一小时/换 cookie/换 IP 都无效，不是本工具的 bug。
+
+---
+
+
 ## 架构
 
 ```
-用户给出公众号文章 URL
-        │
-        ▼
-┌─────────────────────────────┐
-│  wechat-to-ima (本仓库主技能) │
-│  ├─ fetch_articles.py        │  提取 __biz → 循环抓全量(每批间隔防频控) → 去重 → JSON
-│  └─ resume_crawl.py          │  断点续抓 + 增量交付文档
-└──────────────┬──────────────┘
-               │ 提取到的文章链接
-               ▼
-┌─────────────────────────────┐
-│  ima-skill (依赖，随仓库附带) │
-│  └─ ima_api.cjs              │  IMA OpenAPI 客户端：import_urls / search_knowledge_base / ...
-└──────────────┬──────────────┘
-               │
-               ▼
-         IMA 知识库（指定 knowledge_base_id + folder_id）
+Step 0：判断目标号是不是你自己管理的
+   │
+   ├── 是（有后台 admin）──► fetch_articles.py --own
+   │                        appmsgpublish 发表记录 → 不需要 __biz → total_count 验收 → JSON
+   │
+   └── 否（别人的号）──────► fetch_other_channels.py
+                            合集(album, 免登录) + 搜狗微信搜索 → 合并去重 → JSON
+                            ⚠️ 只能尽量多，不保证全量（fakeid 抓全量的接口已被微信关闭）
+                                   │
+                                   ▼
+                     ┌─────────────────────────────┐
+                     │  ima-skill (依赖，随仓库附带) │
+                     │  └─ ima_api.cjs              │  import_urls / search_knowledge_base / ...
+                     └──────────────┬──────────────┘
+                                    │ 单条导入 + 3s（批量会大批失败）
+                                    ▼
+                     IMA 知识库（knowledge_base_id + folder_id），最后 --check 验收
 ```
 
 ---
@@ -75,11 +99,12 @@ gzh-to-ima-skill/
 ├── README.md
 ├── .gitignore
 ├── wechat-to-ima/                 # 主技能：抓取 + 交付
-│   ├── SKILL.md                   # 技能说明（Agent 读取）
-│   ├── fetch_articles.py              # 全量抓取（仅标准库，无需 pip install）
+│   ├── SKILL.md                   # 技能说明（Agent 读取）：Step 0 判定 → 分支 A/B
+│   ├── fetch_articles.py              # 自己的号：appmsgpublish 发表记录，total_count 验收（仅标准库）
+│   ├── fetch_other_channels.py        # 别人的号：合集(album) + 搜狗，多渠道合并去重（仅标准库）
 │   ├── parse_cookie.py                # 把浏览器 Copy All 的 Cookie 转成请求头字符串
 │   ├── resume_crawl.py                # 断点续抓 + 增量交付（支持 CLI 参数，无需改文件）
-│   ├── batch_import_to_ima.py         # 批量导入 JSON 文章到 IMA 知识库
+│   ├── batch_import_to_ima.py         # 导入 IMA（单条 + 3s），支持 --check 验收
 │   └── weixin_credentials.example.py  # 微信凭证模板（复制后填）
 └── ima-skill/                         # 依赖：IMA OpenAPI 客户端（原样附带）
     ├── SKILL.md
@@ -102,12 +127,12 @@ gzh-to-ima-skill/
 
 ## 安装
 
-把两个目录放进你的技能目录（Hermes Agent / WorkBuddy 或其他 Agent 均可）：
+把两个目录放进你的 Agent 技能目录（任意支持 Skill 的 Agent 均可）：
 
 ```bash
-# 放到 WorkBuddy 用户级技能目录（示例）
-cp -r wechat-to-ima  ~/.workbuddy/skills/
-cp -r ima-skill      ~/.workbuddy/skills/
+# 放到你的 Agent 技能目录（示例）
+cp -r wechat-to-ima  <你的技能目录>/
+cp -r ima-skill      <你的技能目录>/
 ```
 
 ---
@@ -150,16 +175,29 @@ echo "你的APIKey"    > ~/.config/ima/api_key
 
 ## 使用
 
-### Step 1：抓取全部文章
+### Step 1A：抓「自己的号」（可验收全量）
 
 ```bash
 cd wechat-to-ima
-python fetch_articles.py \
-  --url "https://mp.weixin.qq.com/s/xxxx" \
-  --name "公众号名称"
+python fetch_articles.py --own --name "我的公众号"
 ```
 
-输出：`<name>_全部文章_YYYYMMDD.json`。空列表 = 已抓到末尾；`200013` = 频控立即停止。
+输出：`<name>_全部文章_YYYYMMDD.json`。结束会打印 `篇数 / total_count`，
+**两者相等才算抓完**（不等则退出码 2，可加 `--resume` 续抓）。`200013` = 频控，立即停止。
+
+### Step 1B：抓「别人的号」（多渠道，尽量多，不保证全量）
+
+```bash
+cd wechat-to-ima
+# 最简：只用搜狗（零凭据）
+python fetch_other_channels.py --name "目标号名称" --sogou-pages 4
+
+# 已知该号有合集时，合集会给出该合集全部文章
+python fetch_other_channels.py --name "目标号" --biz "MzUx..." --album-id 3061234567890
+```
+
+输出：`<name>_多渠道_YYYYMMDD.json`，含 `source`（album/sogou）。
+脚本结束会打印渠道分布、时间覆盖，以及「非自己管理的号无法获取全量」的声明。
 
 ### Step 2（可选）：断点续抓 + 增量交付
 
@@ -167,6 +205,9 @@ python fetch_articles.py \
 cd wechat-to-ima
 python resume_crawl.py --biz "公众号__biz" --name "公众号名称"
 ```
+
+> ⚠️ `resume_crawl.py` 走的是老的 `fakeid` 路径，**只适用于你自己的号**；
+> 别人的号该路径已被微信关闭（`200013`）。
 
 支持 CLI 参数控制，无需编辑脚本文件。更多选项：
 

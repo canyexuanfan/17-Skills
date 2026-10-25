@@ -121,12 +121,15 @@ def gen_doc(new_arts, name, biz):
 
 def find_ima_api_cjs():
     """自动查找 ima_api.cjs 路径"""
-    for candidate in [
+    candidates = [
         os.path.join(SKILL_DIR, "..", "ima-skill", "ima_api.cjs"),
         os.path.join(SKILL_DIR, "..", "..", "ima-skill", "ima_api.cjs"),
-        os.path.expanduser("~/.hermes/skills/ima-skill/ima_api.cjs"),
-        os.path.expanduser("~/.workbuddy/skills/ima-skill/ima_api.cjs"),
-    ]:
+    ]
+    custom = os.environ.get("IMA_API_CJS")
+    if custom:
+        candidates.insert(0, os.path.expanduser(custom))
+    candidates.append(os.path.expanduser("~/.agents/skills/ima-skill/ima_api.cjs"))
+    for candidate in candidates:
         candidate = os.path.abspath(candidate)
         if os.path.exists(candidate):
             return candidate

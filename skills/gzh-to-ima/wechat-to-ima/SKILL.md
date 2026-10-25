@@ -1,110 +1,118 @@
 ---
 name: wechat-to-ima
 description: |
-  将微信公众号的全部历史文章抓取并批量导入到 IMA 知识库。
+  将微信公众号文章抓取并批量导入 IMA 知识库。**第一步必须先判断目标公众号是不是自己管理的号**：
+  自己的号走后台发表记录接口，可拿全量并验收；别人的号走合集/搜狗等多渠道尽可能多抓，
+  且必须声明拿不到全量（微信已关闭按 fakeid 抓他人全量的后台接口）。
   当用户说"把某公众号导入知识库"、"抓取公众号文章到IMA"、"公众号文章备份到知识库"、
   "把公众号URL导入IMA"、"微信公众号文章入库"、"把公众号文章存到知识库"时触发。
-  本技能 = 微信文章抓取(fetch_articles.py，仅标准库) + ima-skill 的 ima_api.cjs 导入。
+  本技能 = 抓取(fetch_articles.py 自己的号 / fetch_other_channels.py 别人的号) + ima-skill 的 ima_api.cjs 导入。
 ---
 
 # wechat-to-ima — 微信公众号文章 → IMA 知识库
 
-## 架构
+## Step 0　先判断：这个号是不是你自己管理的？（决定后面全部路径）
 
-```
-Agent (Claude)
-  ├─ fetch_articles.py  → 提取 __biz → 抓全部文章(每批3秒防频控) → 去重 → JSON
-  └─ ima_api.cjs (来自 ima-skill) → 批量 import_urls 到知识库
-```
+**问用户三个问题，不要自己猜：**
 
-依赖：
+1. 你能在浏览器扫码登录 `mp.weixin.qq.com`，且后台左上角显示的号名就是目标号？
+2. 后台「内容管理 → 发表记录 / 图文素材」里能看到这个号的文章？
+3. 你对这个号有管理员或运营者权限？
 
-- 本技能目录的 `fetch_articles.py`（仅用标准库 `urllib`，**无需 pip install**）
-- `ima-skill` 的 `ima_api.cjs`：
-  `../ima-skill/ima_api.cjs`
-  （IMA 凭证由 ima-skill 管理，见其 SKILL.md 的 Credential Check）
+| 答案 | 分支 | 能拿到 |
+|:--|:--|:--|
+| 全部「是」 | **A：自己的号** | 全量历史，可用 `total_count` 验收 |
+| 任一「否」 | **B：别人的号** | 多渠道尽量多，**不保证全量** |
 
----
-
-## 前置环境（首次运行前必须确认）
-
-1. **微信凭证** `weixin_credentials.py`（与本 SKILL.md 同目录）：
-   - `token` 留空，请在 `weixin_credentials.py` 中填写你自己的 token
-   - `cookie` **必须补充**：浏览器打开 `https://mp.weixin.qq.com/` 扫码登录 →
-     F12 → Application → Cookies → `mp.weixin.qq.com` → 右键 Copy All → 粘贴进 `cookie = "..."`
-   - 凭证过期（API 返回 `200003 invalid session`）：重新扫码，更新 token + cookie
-2. **IMA 凭证**：确认 ima-skill 凭证已配置（否则 `import_urls` 会失败）
-3. **Python 3**：`python fetch_articles.py --help` 能正常打印说明
+> 接口侧验证：自己的号调 `appmsgpublish` 返回 `ret=0`；
+> 别人的号调 `appmsg?action=list_ex&fakeid=<他的biz>` **恒返回 `200013`**。
 
 ---
 
-## 完整工作流（Agent 必须严格遵守）
-
-### Step 1：抓取全部文章
+## 分支 A：自己的号（推荐，可验收）
 
 ```bash
-python "<技能目录>/fetch_articles.py" ^
-  --url "用户给的公众号文章URL" ^
-  --name "公众号名称"
+python fetch_articles.py --own --name "我的公众号" --token <TOKEN> --cookie <COOKIE>
 ```
 
-- 自动从 URL 源码提取 `__biz` → 循环抓取（每批 3 秒防频控）→ 去重 →
-  保存为 `<name>_全部文章_YYYYMMDD.json`（含 title / link / date）
-- ⚠️ 触发频控（`ret=200013`）会**立即停止**并提示，告知用户等 **30–60 分钟**
-- 空列表 = 抓完；输出 JSON 路径在日志末尾打印
+- 走后台「发表记录」接口 `appmsgpublish?sub_action=list_ex`，**不需要 `__biz` / `fakeid`**
+- 每页 5 条、页间 3.5s、每页成功立即落盘（支持 `--resume` 续抓）
+- 结束时打印 `篇数 / total_count`，**两者相等才叫抓完**（不等则退出码 2）
+- 实测：183 篇 / 37 页 / 全程无 200013
 
-### Step 2：查找 IMA 知识库位置
+**凭证**：
+- `token`：后台地址栏 `?token=1234567890` 里那串数字
+- `cookie`：F12 → Application → Cookies → `mp.weixin.qq.com` → Copy All → 单行字符串
+- ⚠️ 约 **1~1.5 小时**失效：`200003` = cookie 死了（重新扫码）；`200040` = 只有 token 旧（只换 token）
+
+## 分支 B：别人的号（多渠道，尽量多）
+
+> ⚠️ **声明一（接口）**：按 `fakeid` 抓任意公众号全量历史的后台接口**已被微信关闭**，
+> 非自己的号一律 `200013 freq control`。这是权限墙，等一小时、换 cookie、换 IP 都无效，
+> 不是本工具的能力缺陷。
+>
+> ⚠️ **声明二（完整性）**：下列渠道只能**尽可能多**地拿到文章，**不保证是全部**。
+> 汇报必须写明覆盖率与缺口，**禁止说成"已抓全"**。
 
 ```bash
-# 搜索知识库，拿到 knowledge_base_id
-node "../ima-skill/ima_api.cjs" ^
-  'openapi/wiki/v1/search_knowledge_base' '{"query":"知识库名称","cursor":"","limit":10}'
-
-# 浏览知识库内容，找目标文件夹（media_type=99 是文件夹），拿到 folder_id
-node "../ima-skill/ima_api.cjs" ^
-  'openapi/wiki/v1/get_knowledge_list' '{"knowledge_base_id":"kb_id","cursor":"","limit":50}'
+python fetch_other_channels.py --name "目标号名称" --sogou-pages 4
+# 若已知该号建过合集（album_id 从任意文章页源码里取）：
+python fetch_other_channels.py --name "目标号" --biz "MzUx..." --album-id 3061234567890
+# 给一篇文章链接，顺带抠 biz / nickname / album_id：
+python fetch_other_channels.py --from-article "https://mp.weixin.qq.com/s/xxxx"
 ```
 
-> 凭证按 ima-skill 规范传递（环境变量或配置文件，详见 ima-skill SKILL.md 的 Credential Check）。
+| 渠道 | 需要什么 | 能拿到 | 坑 |
+|:--|:--|:--|:--|
+| 合集 album | `album_id`（文章页源码里） | 该合集**全部**文章 | 号没建合集 = 这条路不存在 |
+| 搜狗微信搜索 | 只要号名 | 关键词命中的一部分 | 按相关性排序、非时间线；显示名可能是新改的名字 |
 
-### Step 3：批量导入 URL（每批 10 个，间隔 0.5 秒）
-
-使用 `batch_import_to_ima.py` 批量导入：
-
-```bash
-# 搜索知识库
-python "batch_import_to_ima.py" --search "知识库名称"
-
-# 列出知识库内容（查 folder_id）
-python "batch_import_to_ima.py" --list "知识库ID"
-
-# 批量导入到指定文件夹
-python "batch_import_to_ima.py" \
-  --import-json "公众号_全部文章_YYYYMMDD.json" \
-  --kb-id "知识库ID" --folder-id "文件夹ID"
-
-# 导入到根目录（folder-id 留空）
-python "batch_import_to_ima.py" \
-  --import-json "公众号_全部文章_YYYYMMDD.json" \
-  --kb-id "知识库ID"
-```
-
-脚本自动管理批处理、间隔、进度报告，无需手动拼 URL。
-
-### Step 4：汇报
-
-```
-✅ 公众号「XXX」共 XX 篇 | 📅 跨度：开始~结束 | 📂 已导入：知识库 > 文件夹
-```
+- 搜狗：每页 10 条、最多 10 页、页间 6s；`antispider` 出现即停
+- 认号不能看显示名（可能已改名）⇒ 用「搜狗标题集 ∩ IMA 已有标题集」比对
+- 要真正拿到别人的号全量：只能靠微信客户端登录态（`profile_ext` + `uin/key/pass_ticket`），
+  见配套 skill `wechat-profile-ext-scraper`
 
 ---
 
-## 常见问题
+## Step 3　导入 IMA
 
-| 现象 | 原因 | 处理 |
-|------|------|------|
-| 提示缺少 token / cookie | 凭证未填 | 编辑 `weixin_credentials.py` 补充 |
-| 抓取返回 401 / 空列表 | cookie 失效 | 重新扫码，更新 cookie |
-| `200003 invalid session` | 微信 token 过期 | 重新扫码，更新 token + cookie |
-| `200013` 频控 | 抓太快 | 停止，等 30–60 分钟再跑（脚本已自动停） |
-| `import_urls` 报错 | IMA 凭证未配置 | 按 ima-skill 配置凭证后重试 |
+```bash
+# 查知识库 / 文件夹
+python batch_import_to_ima.py --search "知识库名称"
+python batch_import_to_ima.py --list "知识库ID"
+
+# 导入（默认单条 + 3s 间隔，别改成批量）
+python batch_import_to_ima.py --import-json "xxx.json" --kb-id "KB_ID" --folder-id "FOLDER_ID"
+
+# 导入后验收（裸链接率 / 重复组）
+python batch_import_to_ima.py --check --kb-id "KB_ID" --folder-id "FOLDER_ID"
+```
+
+🔴 **必须单条导入**：一批 5 条实测只成 1 条（其余留裸链接）；单条 + 3s 间隔 6/6 全成。
+`--batch-size` 保留只为兼容旧调用，>1 会打印警告。
+
+其他硬约束：
+- IMA **按 URL 去重、不按文章去重** ⇒ 同一篇换签名重导会变成两条
+- 解析失败会留「裸链接」条目（标题就是 URL），**OpenAPI 没有删除接口** ⇒ 只能到客户端手删
+- `200005` = IMA 每日导入额度用尽，次日续跑
+- 解析是异步的：导完等 30~60s 再 `--check`
+
+## Step 4　汇报口径
+
+```
+拿到 N 篇（自己的号：N == total_count ✅ / 别人的号：合集 X + 搜狗 Y）
+时间覆盖：YYYY-MM-DD ~ YYYY-MM-DD
+缺口：别人的号按渠道尽力收集，中间可能仍有未覆盖时段
+```
+
+## 故障速查
+
+| 现象 | 真因 | 动作 |
+|:--|:--|:--|
+| `200013` | 自己的号=真频控；**别人的号=权限墙** | 前者等 30~60min；后者换渠道 |
+| `200003` | cookie 会话过期（约 1~1.5h） | 重新扫码 |
+| `200040` | token 旧、cookie 好 | 只换 token |
+| `200005` | IMA 每日额度用尽 | 次日续跑 |
+| IMA 标题是 URL | 签名过期/被掐 | 重取签名后单条重导 |
+| `appmsgalbum` 报 `10004` | 缺/错 `album_id` | 号没建合集，放弃 |
+| 搜狗「暂无认证订阅号」 | 搜狗账号索引已废 | 改用 `type=2` 文章搜索 |
