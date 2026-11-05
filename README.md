@@ -18,6 +18,7 @@
 | [remove-visible-watermark](skills/remove-visible-watermark/) | 图片去可见水印（纯传统算法）：文字描边掩膜、纹理修复、结构引导融合、WorkBuddy 角标模板反算，不用生成式 AI、全程本地离线 | MIT |
 | [wechat-sticker-pack](skills/wechat-sticker-pack/) | 微信表情包整理打包：图片/视频素材转微信表情开放平台规范格式（静态 PNG/动态 GIF + 横幅/封面/图标），自带规范校验器 | MIT |
 | [private-image-compress](skills/private-image-compress/) | 隐私图片压缩：图片全程不离开本机（127.0.0.1 本地网页工具），不经过 AI 对话与外部服务器，零上传零记录，按平台限额自动寻优 | MIT |
+| [market-scout](skills/market-scout/) | Skill/专家市场侦察：官方市场 + SkillHub 五源聚合检索，六维评分 + 玫瑰风向图，源码级深检（提示注入/硬编码密钥/危险调用，critical 熔断），检索→评估→安装闭环 | Apache-2.0 |
 
 ## 安装
 
@@ -51,5 +52,5 @@
 ## 许可 · License
 
 - 合集骨架（根 README / CI / .gitignore）：[MIT](LICENSE)
-- 各 Skill 保留原始许可：gzh-to-ima 为 [MIT](skills/gzh-to-ima/LICENSE)，breakout-cli-login 为 [AGPL-3.0](skills/breakout-cli-login/LICENSE)，image-copyright-watermark、image-to-prompt、remove-visible-watermark、wechat-sticker-pack 与 private-image-compress 为 [MIT](skills/image-copyright-watermark/LICENSE)，xweb 为 [Apache-2.0](skills/xweb/LICENSE)
-- 收录历史：gzh-to-ima 与 breakout-cli-login 由同名原仓库 subtree 迁入（提交历史完整保留），原仓库已归档并指向本仓库；image-copyright-watermark、image-to-prompt、xweb、remove-visible-watermark、wechat-sticker-pack、private-image-compress 为本仓库首发
+- 各 Skill 保留原始许可：gzh-to-ima 为 [MIT](skills/gzh-to-ima/LICENSE)，breakout-cli-login 为 [AGPL-3.0](skills/breakout-cli-login/LICENSE)，image-copyright-watermark、image-to-prompt、remove-visible-watermark、wechat-sticker-pack 与 private-image-compress 为 [MIT](skills/image-copyright-watermark/LICENSE)，xweb 与 market-scout 为 [Apache-2.0](skills/xweb/LICENSE)
+- 收录历史：gzh-to-ima 与 breakout-cli-login 由同名原仓库 subtree 迁入（提交历史完整保留），原仓库已归档并指向本仓库；image-copyright-watermark、image-to-prompt、xweb、remove-visible-watermark、wechat-sticker-pack、private-image-compress、market-scout 为本仓库首发

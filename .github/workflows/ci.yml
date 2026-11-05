@@ -198,3 +198,39 @@ jobs:
             exit 1
           fi
           echo "secret scan passed"
+
+  market-scout-syntax:
+    # market-scout：纯标准库 Python（零依赖），CI 仅语法+凭证扫描，不做联网请求
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'ci-skip') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python syntax check
+        run: |
+          python -m py_compile skills/market-scout/scripts/market_search.py skills/market-scout/scripts/pull_snapshot.py skills/market-scout/scripts/wb_auth.py
+
+      - name: No hardcoded credentials
+        # market-scout 只允许用户本机运行时解密自己的登录态，绝不允许提交任何真实凭证
+        run: |
+          if grep -rIin -E "eyJ[A-Za-z0-9_-]{20,}|Bearer [A-Za-z0-9_-]{30,}|AKID[A-Za-z0-9]{10,}|cookie\s*[:=]\s*['\"][^'\"]{40,}|uid['\"]?\s*[:=]\s*['\"][a-z0-9]{16,}" \
+            skills/market-scout; then
+            echo "::error::检测到疑似真实凭证硬编码，已阻止。凭证只能来自用户本机登录态或其自设环境变量。"
+            exit 1
+          fi
+          echo "credential scan passed"
+
+      - name: Secret leak scan
+        run: |
+          if grep -rIin -E "wxuin=|slave_sid=|bizuin=|AKID[A-Za-z0-9]{10,}|token=15[0-9]{8}" \
+            skills/market-scout; then
+            echo "::error::检测到疑似凭证泄漏，已阻止。请检查改动。"
+            exit 1
+          fi
+          echo "secret scan passed"
