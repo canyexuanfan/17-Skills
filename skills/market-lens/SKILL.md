@@ -1,16 +1,16 @@
 ---
-name: market-scout
+name: market-lens
 display_name: 全市场技能侦察官
-display_name_en: Market Scout
+display_name_en: Market Lens
 description: 全市场技能侦察官。输入一句话需求，自动在 WorkBuddy 官方运营市场（技能 43k/专家 32k/专家包 429）与 SkillHub 社区市场（217k）四大数据源中检索候选，BM25 排序 + 同义词扩展跨语言召回，六维打分（契合/质量/效果/热度/活跃/权威，--radar 生成玫瑰风向图），对候选做 10 项源码级深检（功能质量组/安全质量组，critical 熔断），对比推荐最优；用户确认后直接调用内置工具完成安装，一站式闭环。纯标准库零依赖，免配置（自动复用本机客户端登录态），检索/深检全程只读不影响市场数据。触发词：帮我找个技能/找专家/哪个技能最好/市场里有没有/推荐技能/对比技能/skill 选型/帮我装上。
 description_zh: 一句话需求，全市场（官方运营市场 + SkillHub）检索候选，六维评分与玫瑰风向图对比，源码级深检防货不对板与恶意包，推荐最优技能并可在确认后一键安装。
 description_en: "Search the whole WorkBuddy skill ecosystem (official market + SkillHub), rank candidates with BM25 and six-dimension scoring, deep-inspect source code for quality and safety, recommend the best skill, and install it on user confirmation."
 category: productivity-tools
-version: 1.1.0
+version: 1.2.0
 author: 十七°
 ---
 
-# market-scout —— 全市场技能侦察官
+# market-lens —— 全市场技能侦察官
 
 目标：用户只需说出需求，你负责在全市场找出最合适的技能/专家，并给出有依据的对比评估结论。
 
@@ -59,7 +59,7 @@ python ".../market_search.py" "查询词" --top 8 --live
 ```
 - **关键词匹配特性**：官方 API 的 keyword 是**连续子串匹配**，多词长查询会漏（"Excel 数据清洗去重"→0，"数据清洗"→100）。live 前把查询拆成 1~2 个核心短词分别跑
 - live 偶发网络抖动失败属正常（Clash 代理），重跑一次即可；失败不影响离线结果
-- live 认证三级（自动降级）：① **零配置**——`scripts/wb_auth.py` 自包含模块自动发现并解密**用户本机** WorkBuddy 客户端登录态（Windows/macOS/Linux 标准路径 + `~/.workbuddy/auth` 兜底；accessToken 兼容明文 JWT 与 5.6.2+ AES-256-GCM 加密信封；**只读不写、绝不打印完整凭证**，本 Skill 不含任何硬编码凭证）→ Bearer 调门户 API（已实测技能/专家接口均接受，30 天有效）；② cookie 兜底（`config.json` 的 auth.cookie_file，浏览器 F12 → Network → 任意 /portal/ 请求 → Copy as cURL 提取，7 天过期）；③ 环境变量 `WORKBUDDY_BEARER_TOKEN` 显式指定。401 时提示：重新登录客户端后重试，或 F12 Copy as cURL 更新 cookie 文件
+- live 认证三级（自动降级）：① **零配置**——`scripts/wb_auth.py` 自包含模块自动发现并解密本机 WorkBuddy 客户端登录态（AES-256-GCM 信封，兼容 5.6.2+；Windows/macOS/Linux 全平台路径 + 多级密钥定位：环境变量 → 密钥文件 → DPAPI → 运行中客户端进程内存扫描；**只读不写、不打印完整凭证、包内无任何硬编码凭证**，无外部技能依赖）→ Bearer 调门户 API（已实测技能/专家接口均接受，30 天有效）；② cookie 兜底（`config.json` 的 auth.cookie_file，7 天过期）；③ 环境变量 `WORKBUDDY_BEARER_TOKEN` 显式指定。401 时提示：重新登录客户端后重试，或 F12 Copy as cURL 更新 cookie 文件
 
 ### 第 4 步：语义复评（必须做，不能只看分数）
 对每源 Top 3~5 逐条读描述，进行 AI 判断：
@@ -79,7 +79,7 @@ python ".../market_search.py" --inspect tencent-adm/tencent-docs
 ```bash
 python ".../market_search.py" --inspect skill_a,skill_b,skill_c
 ```
-zip 缓存在 `market-scout/cache/`，二次深检秒出；数据新鲜度自查：`python ".../market_search.py" --stats`（快照超 7 天会警告）。
+zip 缓存在技能根目录 `cache/`（相对 SKILL_DIR 解析），二次深检秒出；数据新鲜度自查：`python ".../market_search.py" --stats`（快照超 7 天会警告）。
 **读透源码再评价**：深检报告给的是结构化信号，你必须基于其中的文件清单和 SKILL.md 长度判断「这个技能真的能做用户要的事吗」，不能只把分数搬进对比表。
 
 ### 第 6 步：输出对比结论
@@ -103,6 +103,16 @@ zip 缓存在 `market-scout/cache/`，二次深检秒出；数据新鲜度自查
 4. 搜索结果里找不到目标（如 SkillHub 技能未收录进该工具）时，兜底引导用户：客户端「技能市场」搜索技能名 → 安装，并给出技能准确名称
 5. 安装成功后可跟进一句：需要的话用新技能实际跑一遍验证效果（功能是否达标以实测为准，呼应质量优先原则）
 注：安装动作由用户确认触发，走 WorkBuddy 正常安装流程、产生正常安装计数——这与本 skill 检索/深检的"只读"不冲突（推荐环节依旧零写入）。
+
+### 附：发布任何技能前的名称占用自检（必做，踩过坑）
+
+打包上传任何技能前，先用本技能的检索能力检查候选英文名是否已被市场占用（2026-11-05 实测：market-scout 在官方市场与 SkillHub 均已存在同名技能，直接上传被拒「技能名称已被占用」）。上传被拒不仅浪费一次审核，同名还会导致市场混淆：
+```bash
+python "{SKILL_DIR}/scripts/market_search.py" --check-name "候选英文名"
+```
+- 四源精确匹配（归一化：大小写/连字符/下划线/空格视为同名）+ 相近名称提示；任一源命中占用则**退出码 2**，可直接用于打包脚本卡点
+- 数据文件缺失的源会明确警告"未被本次自检覆盖"，不要忽略；对刚上架的新名字可加 `--live` 实时复核
+- 结论为 ✅ 才允许打包上传；被占用就换名重查，不要带侥幸提交
 
 ## 评估维度定义
 

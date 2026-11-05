@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""market-scout 本地索引快照构建（可选，首次使用建议执行一次）
+"""market-lens 本地索引快照构建（可选，首次使用建议执行一次）
 
 拉取四大数据源到 data/ 目录，供 market_search.py 离线全量检索：
   - official_skills     官方运营市场·技能（约 43k 条，需登录态/cookie，几分钟）

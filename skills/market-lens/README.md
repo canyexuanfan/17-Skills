@@ -1,6 +1,6 @@
-# market-scout —— 全市场技能侦察官
+# market-lens —— 全市场技能侦察官
 
-> v1.0.0（2026-11-05）｜一句话需求，全市场找技能> 一句话需求，全市场找技能：**29 万+ 候选秒级检索 → 六维量化打分 + 玫瑰风向图 → 10 项源码级深检 → 给出有依据的最优推荐 → 用户确认后一键安装**。检索/深检全程只读，不影响市场上任何技能的统计数据。
+> v1.2.0（2026-11-05）｜一句话需求，全市场找技能：**29 万+ 候选秒级检索 → 六维量化打分 + 玫瑰风向图 → 10 项源码级深检 → 给出有依据的最优推荐 → 用户确认后一键安装**。检索/深检全程只读，不影响市场上任何技能的统计数据。
 
 ## 它解决什么问题
 
@@ -10,7 +10,7 @@ WorkBuddy 生态里技能、专家、连接器分散在两个市场、四个数�
 - 描述与实际能力不符的"货不对板"包
 - 带提示注入、硬编码密钥、隐写、危险脚本的恶意/低质包
 
-market-scout 把四个源拉成本地全量索引，用 BM25 检索 + 源码安全深检回答"哪个技能最好"。
+market-lens 把四个源拉成本地全量索引，用 BM25 检索 + 源码安全深检回答"哪个技能最好"。
 
 ## 能力总览
 
@@ -59,8 +59,8 @@ python scripts/market_search.py --stats
 
 ## 认证（三级自动降级，免配置）
 
-1. **零配置**：内置自包含模块 `scripts/wb_auth.py` 自动发现并解密**你本机**的 WorkBuddy 客户端登录态（Windows/macOS/Linux 标准路径 + `~/.workbuddy/auth` 兜底；兼容明文 JWT 与 5.6.2+ AES-256-GCM 加密信封），Bearer 令牌直接调门户 API。**只读不写、绝不打印完整凭证；本 Skill 不含任何硬编码凭证**——所有凭证均来自你自己的登录态或你自己设置的环境变量
-2. **Cookie 兜底**：`config.json` 的 `auth.cookie_file`（浏览器 F12 → Network → 任意 /portal/ 请求 → Copy as cURL 提取，7 天过期）
+1. **零配置**：自动解密本机 WorkBuddy 客户端登录态（`%LOCALAPPDATA%\CodeBuddyExtension\Data\Public\auth\workbuddy-desktop.info`），Bearer 令牌直接调门户 API，只读不写
+2. **Cookie 兜底**：`config.json` 的 `auth.cookie_file`（浏览器 F12 → Copy as cURL 提取）
 3. **环境变量**：`WORKBUDDY_BEARER_TOKEN` 显式指定
 
 SkillHub 全部 API 免登录（列表/文件清单/单文件源码/版本安全报告）。
@@ -81,7 +81,7 @@ python scripts/pull_snapshot.py all      # 含 SkillHub 全量（约 30-60 分�
 ## 目录结构
 
 ```
-market-scout/
+market-lens/
 ├── SKILL.md                  # AI 工作流说明（触发后按此执行）
 ├── README.md                 # 本文件
 ├── CHANGELOG.md              # 版本记录

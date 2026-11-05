@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""wb_auth.py —— market-scout 自包含的本机 WorkBuddy 凭证发现与解密模块。
+"""wb_auth.py —— market-lens 自包含的本机 WorkBuddy 凭证发现与解密模块。
 
 作用：让本 Skill 的用户在**自己的机器**上找到并使用**自己的** WorkBuddy 客户端登录态
 （accessToken），实现零配置认证。模块特性：
@@ -12,7 +12,7 @@
   · 密钥多级定位：环境变量 WORKBUDDY_ATREST_KEY / WORKBUDDY_ATREST_KEY_FILE →
     密钥文件扫描 → DPAPI blob → 运行中客户端进程内存扫描。
 
-来源声明：本模块由作者本人的 totorosir-workbuddy-checkin（v3.1.7）技能中的登录态
+来源声明：本模块由作者本人的 totorosir-workbuddy-checkin（v3.1.7，开源仓库 canyexuanfan/agent-checkin-automation，MIT）技能中的登录态
 解密段原样移植（同一作者），算法复刻自 WorkBuddy 客户端 packages/at-rest-crypto。
 """
 

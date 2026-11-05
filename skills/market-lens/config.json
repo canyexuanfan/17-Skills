@@ -31,12 +31,5 @@
     "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
     "note": "认证三级自动降级：①零配置——scripts/wb_auth.py 自包含模块自动发现并解密用户本机客户端登录态(accessToken Bearer，只读不写，绝不打印完整凭证，本包不含任何硬编码凭证)；②cookie 兜底——把 cookie_file 指向一个存有完整 cookie 的文本文件（浏览器 F12 → Network → 任意 /portal/ 请求 → Copy as cURL 提取，7 天过期）；③环境变量 WORKBUDDY_BEARER_TOKEN 显式指定。user_id 留空则自动从登录态读取。APISIX 校验完整浏览器 UA，勿用简写 UA"
   },
-  "weights": {
-    "relevance": 0.35,
-    "quality": 0.2,
-    "adoption": 0.1,
-    "popularity": 0.15,
-    "freshness": 0.1,
-    "authority": 0.1
-  }
+  "weights": {"relevance": 0.35, "quality": 0.20, "adoption": 0.10, "popularity": 0.15, "freshness": 0.10, "authority": 0.10}
 }

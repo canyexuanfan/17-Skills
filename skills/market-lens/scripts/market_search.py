@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-market-scout 检索评估引擎
+market-lens 检索评估引擎
 在 WorkBuddy 官方运营市场(技能/专家/专家包)与 SkillHub 社区市场中
 按需求检索候选并做多维度打分。纯标准库，无第三方依赖。
 
 用法:
   python market_search.py "需求描述" [--top 10] [--sources all|official_skills,official_experts,...] [--json] [--live]
+  python market_search.py --check-name "候选名称" [--live]   # 发布前名称占用自检（精确+近似，命中占用时退出码 2）
 """
 import argparse, json, math, os, re, sys, time, heapq, subprocess, urllib.request, urllib.parse, uuid
 from datetime import datetime, timezone
@@ -332,7 +333,7 @@ RADAR_AXES = [("契合", "relevance"), ("质量", "quality"), ("效果", "adopti
               ("热度", "popularity"), ("活跃", "freshness"), ("权威", "authority")]
 RADAR_COLORS = ["#4f86f7", "#e5533d", "#3ba55d", "#f5a623", "#9b59b6", "#20b2aa"]
 
-def render_radar_svg(cands, out_path, title="market-scout 六维评分"):
+def render_radar_svg(cands, out_path, title="market-lens 六维评分"):
     """把候选的六维分数画成玫瑰风向图（雷达图），最多叠加 6 个候选。
     cands: [{"title":..., "scores": {...}}, ...]；写入 out_path 返回路径。"""
     W, H = 880, 620
@@ -546,7 +547,7 @@ import zipfile, shutil, tempfile, string
 # Pattern definitions (prompt injection / obfuscation / secret / dangerous script)
 # are derived from getsentry/skills skill-scanner (scripts/scan_skill.py),
 # Copyright (c) Sentry, licensed under the Apache License, Version 2.0.
-# Modifications and extensions for market-scout by 十七° (2026). See THIRDPARTY-NOTICES.md.
+# Modifications and extensions for market-lens by 十七° (2026). See THIRDPARTY-NOTICES.md.
 
 PROMPT_INJECTION_PATTERNS = [
     (r"(?i)ignore\s+(all\s+)?previous\s+instructions", "指令覆盖: ignore previous instructions", "critical"),
@@ -1019,7 +1020,7 @@ def inspect_skillhub_skill(owner_slug, cfg):
 
 # ---------------- 输出 ----------------
 def render_md(query, results):
-    lines = [f"# market-scout 检索结果：{query}", ""]
+    lines = [f"# market-lens 检索结果：{query}", ""]
     for src, res in results.items():
         lines.append(f"## {res.get('label', src)}")
         if "error" in res:
@@ -1116,7 +1117,7 @@ def render_inspect(r):
 
 def show_stats(cfg):
     """数据源新鲜度自检"""
-    lines = ["# market-scout 数据源状态", ""]
+    lines = ["# market-lens 数据源状态", ""]
     for name, meta in cfg["sources"].items():
         p = meta["path"]
         if not os.path.exists(p):
@@ -1146,6 +1147,80 @@ def show_stats(cfg):
         lines.append("- ⚠ 登录 Cookie 文件缺失，live/官方实时不可用")
     return "\n".join(lines)
 
+# ---------------- 发布前名称占用自检 ----------------
+def _norm_name(s):
+    """名称归一化：小写并抹掉连字符/下划线/空格/点，'market-lens' 与 'Market_Lens' 视为同名"""
+    return re.sub(r"[-_\s.]+", "", (s or "").lower())
+
+def check_name(name, cfg, sources, top=5):
+    """发布前名称占用自检：对候选技能名在指定数据源做精确与近似匹配。
+    精确 = 归一化后与某技能的 slug/name/display_name 完全一致；
+    近似 = 互为子串且长度差 <= 10（提示易混淆，建议避开）。
+    返回 (report_lines, taken:bool)。"""
+    raw = (name or "").strip()
+    tgt = _norm_name(raw)
+    if not tgt:
+        return ["错误：名称为空"], False
+    lines = [f"名称占用自检：{raw!r}（归一化 → {tgt!r}）", ""]
+    taken = False
+    for src in sources:
+        meta = cfg["sources"].get(src)
+        if not meta:
+            continue
+        path = meta["path"]
+        if path and not os.path.isabs(path):
+            path = os.path.normpath(os.path.join(BASE, "..", path))
+        if not os.path.exists(path):
+            lines.append(f"[{meta['label']}] ⚠ 数据缺失: {path}")
+            lines.append("    → 该源未被本次自检覆盖！可运行 scripts/pull_snapshot.py 建索引后重跑，或加 --live 实时校验")
+            continue
+        loader, _ = LOADERS[src]
+        rows, _ = loader(path)
+        exact, near = [], []
+        for r in rows:
+            variants = {_norm_name(r.get("name")), _norm_name(r.get("title"))}
+            variants.discard("")
+            if tgt in variants:
+                exact.append(r)
+                continue
+            if len(near) < top:
+                for c in variants:
+                    if (tgt in c or c in tgt) and min(len(c), len(tgt)) >= 5 and abs(len(c) - len(tgt)) <= 10:
+                        near.append(r)
+                        break
+        if exact:
+            taken = True
+            lines.append(f"[{meta['label']}] ❌ 已被占用（{len(exact)} 条）：")
+            for r in exact[:top]:
+                lines.append(f"    - slug/name: {r['name']}  显示名: {r['title']}  id: {r['id']}  ver: {r.get('version')}  更新: {r.get('updated')}")
+        else:
+            lines.append(f"[{meta['label']}] ✅ 未占用")
+        if near:
+            lines.append("    ⚠ 相近名称（发布易混淆，建议避开）：")
+            for r in near[:top]:
+                lines.append(f"    - {r['name']} / {r['title']}  id: {r['id']}")
+    return lines, taken
+
+def check_name_live(name, cfg, top=10):
+    """名称占用自检的实时补充：查在线 API 关键词命中里是否有精确同名（覆盖快照之后新上架的）。失败不影响离线结论。"""
+    tgt = _norm_name(name)
+    out = []
+    hits = live_skillhub(name, top)
+    for it in hits:
+        if it.get("error"):
+            out.append(f"[SkillHub·实时] 跳过: {it['error'][:80]}")
+            continue
+        if tgt in {_norm_name(it.get("title")), _norm_name(it.get("id", "").split("/")[-1])}:
+            out.append(f"[SkillHub·实时] ❌ 已占用: {it.get('id')}  ver={it.get('version')}")
+    lo = live_official(name, cfg, "skills", top)
+    for it in lo:
+        if it.get("error"):
+            out.append(f"[官方技能·实时] 跳过: {it['error'][:80]}")
+            continue
+        if tgt in {_norm_name(it.get("title"))}:
+            out.append(f"[官方技能·实时] ❌ 已占用: {it.get('title')}  id={it.get('id')}")
+    return out
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("query", nargs="?", help="需求描述（检索模式）")
@@ -1157,9 +1232,27 @@ def main():
                     help="源码级深检（可逗号分隔批量）：官方技能传 skill_id，SkillHub 传 owner/slug")
     ap.add_argument("--stats", action="store_true", help="查看数据源新鲜度与缓存状态")
     ap.add_argument("--radar", metavar="OUT.svg", help="生成 top 候选六维玫瑰风向图 SVG")
+    ap.add_argument("--check-name", metavar="NAME",
+                    help="发布前名称占用自检：对候选技能名做四源精确+近似匹配，命中占用时退出码 2（可配合 --live 实时复核）")
     args = ap.parse_args()
 
     cfg = load_config()
+
+    if args.check_name:
+        srcs = list(cfg["sources"].keys()) if args.sources == "all" else args.sources.split(",")
+        lines, taken = check_name(args.check_name, cfg, srcs)
+        if args.live:
+            live_lines = check_name_live(args.check_name, cfg)
+            if live_lines:
+                lines.append("")
+                lines.extend(["-- 实时复核（覆盖快照后新上架） --"])
+                lines.extend(live_lines)
+                for l in live_lines:
+                    if "❌" in l:
+                        taken = True
+        print("\n".join(lines))
+        print("\n结论：" + ("❌ 名称已被占用，必须换名后重新自检" if taken else "✅ 全部数据源未发现占用，可以使用"))
+        sys.exit(2 if taken else 0)
 
     if args.stats:
         print(show_stats(cfg))
@@ -1189,7 +1282,7 @@ def main():
     if args.radar:
         pool = [c for src, res in results.items() for c in res.get("top", [])[:3] if "scores" in c]
         if pool:
-            render_radar_svg(pool, args.radar, f"market-scout：{args.query[:20]}")
+            render_radar_svg(pool, args.radar, f"market-lens：{args.query[:20]}")
             print(f"玫瑰图已生成: {args.radar}")
 
     if args.live:
