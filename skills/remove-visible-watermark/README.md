@@ -39,7 +39,18 @@
 
 需要 Python 3.10+。**无需手动装依赖**：Agent 执行时先跑 `scripts/bootstrap.py --check-only`，缺依赖时用 `--install` 自动创建隔离缓存环境（按 `requirements.txt` 的版本约束安装）。后续使用自举脚本返回的 Python 路径执行处理命令。首次安装依赖需要联网，图片处理不需要联网。
 
-依赖仍为 numpy、Pillow、opencv-python-headless（headless 版无 GUI 依赖，适合服务器和自动化），**1.3.0 未增加运行时依赖**。
+依赖仍为 numpy、Pillow、opencv-python-headless（headless 版无 GUI 依赖，适合服务器和自动化），**默认路径 1.4.0 仍未增加运行时依赖**；可选深度修复后端为额外安装、不影响默认功能。
+
+### 可选深度修复（big-lama）安装与离线部署
+
+深度修复是可选能力，装不装都不影响传统管线。安装分两步：
+
+1. **Python 包**（连带 torch CPU 约 200MB）：`PYTHON -m pip install simple-lama-inpainting`。其历史版本约束（numpy<2、Pillow<10）会降级共享环境的库，**建议独立虚拟环境**。慢速网络可加国内 PyPI 镜像，如 `-i https://pypi.tuna.tsinghua.edu.cn/simple`。
+2. **big-lama 权重（约 196MB）**，两种方式：
+   - **离线部署（推荐，弱网友好）**：手动下载 `big-lama.pt`（来源见下），校验 sha256 `7ba7aa7ac37a4d41fdbbeba3a2af7ead18058552997e3a3cd1a3b2210c9e6b4c`（205,803,670 字节），然后设环境变量 `LAMA_MODEL` 指向该文件路径。设置后推理完全不联网。
+   - **默认自动**：不设 `LAMA_MODEL` 时，包在首次使用时从 GitHub Releases 下载并缓存到 torch hub 目录（`TORCH_HOME` 可控，建议指到非系统盘）。该下载依赖网络质量，慢速链路可能反复中断，故弱网用户建议走上面的离线部署。
+
+权重来源：开源仓库 advimman/lama（Apache-2.0）官方权重，经 enesmsahin/simple-lama-inpainting 的 Release 分发。
 
 安装到 Agent 宿主：整个 `remove-visible-watermark` 目录放入 skills 加载目录即可。
 

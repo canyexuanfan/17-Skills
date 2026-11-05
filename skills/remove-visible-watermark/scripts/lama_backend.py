@@ -11,14 +11,45 @@ and re-runs the same scope validation as every other backend.
 """
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 import numpy as np
 
+WEIGHTS_SHA256 = "7ba7aa7ac37a4d41fdbbeba3a2af7ead18058552997e3a3cd1a3b2210c9e6b4c"
+WEIGHTS_SIZE_BYTES = 205_803_670
+
 INSTALL_HINT = (
-    "Deep repair needs optional dependencies that are not installed: run "
-    "PYTHON -m pip install simple-lama-inpainting (installs PyTorch and pins "
-    "numpy<2/Pillow<10, so prefer a dedicated virtual environment; the "
-    "big-lama weights load locally and processing never touches the network)."
+    "Deep repair needs optional dependencies that are not installed. One-time "
+    "setup, two parts: (1) PYTHON -m pip install simple-lama-inpainting "
+    "(installs PyTorch, roughly 200 MB; pins numpy<2/Pillow<10, so prefer a "
+    "dedicated virtual environment; on slow links use a PyPI mirror such as "
+    "https://pypi.tuna.tsinghua.edu.cn/simple). (2) The big-lama weights "
+    "(about 196 MB) load from local storage and processing never touches the "
+    "network afterwards. Preferred offline setup: download big-lama.pt once, "
+    "verify its sha256, and point LAMA_MODEL at the file to skip the "
+    "first-use download entirely; otherwise the package fetches it from "
+    "GitHub on first run, which is slow on some networks. Set TORCH_HOME to "
+    "keep the hub cache off the system drive."
 )
+
+
+def _weights_status() -> dict:
+    """Where the torchscript weights would come from, without loading them."""
+    explicit = os.environ.get("LAMA_MODEL")
+    if explicit:
+        return {"mode": "LAMA_MODEL", "path": explicit,
+                "present": Path(explicit).is_file()}
+    try:
+        import torch
+        path = Path(torch.hub.get_dir()) / "checkpoints" / "big-lama.pt"
+    except Exception:
+        path = None
+    if path is not None and path.is_file():
+        return {"mode": "torch_hub_cache", "path": str(path),
+                "present": True}
+    return {"mode": "first_use_download", "path": str(path) if path else None,
+            "present": False}
 
 _STATE = {"model": None, "loaded": False}
 
@@ -39,7 +70,7 @@ def availability() -> dict:
                 "import_error": str(exc)}
     return {"available": True, "package": "simple-lama-inpainting",
             "model": "big-lama (fp32)", "device": device,
-            "torch": torch_version}
+            "torch": torch_version, "weights": _weights_status()}
 
 
 def _model():

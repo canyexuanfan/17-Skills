@@ -96,6 +96,7 @@ PYTHON SKILL/scripts/run.py --input-dir /path/images --output-dir /path/cleaned 
 - `--corner-text` 只是可选保守候选入口，可能主动跳过；不要以它代替 Agent 观察并指定区域。默认模板自动模式不做全图文字擦除。
 - 批量自动入口不接受共享手动区域或掩膜。未知水印位置各异时逐张定位、逐张调用；保留汇总说明。
 - big-lama 首次运行需从本地加载约 200MB fp32 权重；CPU 推理较慢，有 NVIDIA GPU 时自动走 CUDA。权重来源为开源仓库 advimman/lama（Apache-2.0），经 `simple-lama-inpainting` 封装。
+- 深度修复是**可选安装**，默认路径零下载。安装分两步：① `PYTHON -m pip install simple-lama-inpainting`（连带 torch CPU 约 200MB，慢速网络可加 `-i https://pypi.tuna.tsinghua.edu.cn/simple`；其旧版本约束 numpy<2/Pillow<10 建议独立虚拟环境）；② big-lama 权重约 196MB。**推荐离线方式**：手动下载 `big-lama.pt`（sha256 `7ba7aa7a…0c9e6b4c`，完整值见 lama_backend.py），设环境变量 `LAMA_MODEL` 指向该文件即可跳过首次联网下载；不设则包在首次使用时从 GitHub 拉取（网络慢时可能反复中断）。`TORCH_HOME` 可把 hub 缓存指到非系统盘。`--strict-classical` 默认开启时不装后端 Skill 功能不受影响。
 - 参数、输出与错误处理见 [references/cli.md](references/cli.md)。
 - 模板校准与扩展见 [references/profiles.md](references/profiles.md)。
 - 算法原理与误差来源见 [references/methods.md](references/methods.md)。
