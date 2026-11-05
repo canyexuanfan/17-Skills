@@ -6,7 +6,7 @@ description: 全市场技能侦察官。输入一句话需求，自动在 WorkBu
 description_zh: 一句话需求，全市场（官方运营市场 + SkillHub）检索候选，六维评分与玫瑰风向图对比，源码级深检防货不对板与恶意包，推荐最优技能并可在确认后一键安装。
 description_en: "Search the whole WorkBuddy skill ecosystem (official market + SkillHub), rank candidates with BM25 and six-dimension scoring, deep-inspect source code for quality and safety, recommend the best skill, and install it on user confirmation."
 category: productivity-tools
-version: 1.0.0
+version: 1.1.0
 author: 十七°
 ---
 

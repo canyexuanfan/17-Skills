@@ -34,6 +34,15 @@
 - 图例与图形坐标校验：数据多边形最大 x≈499，图例起始 x=624，零重叠
 - 4~5 候选叠加渲染正常（多边形/图例/总分）
 
+
+## 1.1.0 认证模块（wb_auth.py）补充实测
+
+| 测试 | 结果 |
+|---|---|
+| 自包含解密（wb_auth.load_token_best，无外部 skill 依赖） | OK：加密信封解密成功，仅输出掩码（前6+后4字符），完整凭证零打印 |
+| live 官方源冒烟（重构后 _load_bearer → wb_auth） | OK：Bearer 调官方技能搜索接口返回真实数据 |
+| 凭证硬编码扫描（CI 同款 grep：eyJ/Bearer/AKID/cookie/uid） | 通过，全包零命中 |
+| py_compile 三脚本（Python 3.13） | 通过 |
 ## 已知边界（未实测/不支持）
 
 - 未在 macOS/Linux 验证（登录态解密路径为 Windows 专属；SkillHub 免登录功能跨平台应可用）

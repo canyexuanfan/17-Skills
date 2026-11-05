@@ -1,5 +1,15 @@
 # 更新日志
 
+## 1.1.0（2026-11-05）
+
+认证自包含重构（为开源发布准备）。
+
+- 新增 `scripts/wb_auth.py`：自包含的本机 WorkBuddy 凭证发现与解密模块（跨平台路径探测 + 5.6.2+ AES-256-GCM 加密信封兼容 + 密钥多级定位），由作者本人的 totorosir-workbuddy-checkin（v3.1.7）登录态解密段原样移植，不再依赖本机已安装的其他技能
+- `_load_bearer()` 重构为引用 wb_auth；cookie 兜底与环境变量 `WORKBUDDY_BEARER_TOKEN` 降级路径不变
+- 安全承诺固化：模块只读不写、绝不打印完整凭证（仅 `mask_token()` 掩码）；全包不含任何硬编码凭证
+- THIRDPARTY-NOTICES.md 补 wb_auth 来源声明；SKILL.md / README / config.json 认证说明同步
+- CI 新增硬编码凭证扫描（eyJ/Bearer/AKID/cookie/uid 五类模式）
+
 ## 1.0.0（2026-11-05）
 
 首发版本。
