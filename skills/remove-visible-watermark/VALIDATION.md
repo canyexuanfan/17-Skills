@@ -1,3 +1,40 @@
+# 交付校验记录｜1.4.0
+
+日期：2026-11-05。本次新增**可选本地深度修复后端**（开源 big-lama，经 `simple-lama-inpainting`，Apache-2.0）：显式 `--method lama`，以及 `--no-strict-classical` 时 auto 在经典预算失败后的记录式升级。默认路径（strict-classical）仍全程传统算法，不下载权重、不导入 torch。上传字段、作者、MIT 许可与全部历史记录保留。
+
+## 新增内容与边界
+
+- `scripts/lama_backend.py`：可选后端。`availability()` 探测 `simple_lama_inpainting` 与 big-lama 权重（本地 `TORCH_HOME`，推理离线）；未安装时给出明确安装指引，不静默降级。
+- `restore.py`：第 7 个方法 `lama`；auto 在 `allow_lama_escalation=True` 且经典修复抛出预算类失败时升级到 lama，升级原因写入 `restoration.lama.escalation_reason`；写入仍严格限定在授权掩膜内。
+- `run.py`：`--strict-classical` 改为 `BooleanOptionalAction`（默认 true）；报告新增 `lama_used` 与条件性 `strict_classical=false`；版本 1.4.0。
+- 依赖边界：`simple-lama-inpainting` 的历史版本约束（numpy<2 等）不适合共享环境，建议独立虚拟环境安装；默认 requirements 不含它，bootstrap 探针以 `lama` 字段如实上报可用性。
+
+## 执行环境与回归
+
+Windows 11；Python 3.13.9（独立 venv）；venv 内 torch 2.14.1+cpu / torchvision 0.29.1+cpu / simple-lama-inpainting 0.1.1 / fire 0.5.0，共享路径提供 NumPy 2.5.4 / Pillow 12.3.0 / OpenCV 4.11.0；big-lama fp32 权重 205.8MB 本地加载（zip 完整性校验通过）。
+
+最终公开 CLI 自测 **26 项通过、0 项失败**（新增 2 项），耗时 47.8 秒。新增用例：
+
+1. `lama_explicit_backend_or_clear_opt_in_error`：真机 CPU 推理 10.7 秒，报告 `method=lama`、`lama_used=true`、`strict_classical=false`，输入字节不变；后端未安装环境下同用例验证退出码 2 与安装指引。
+2. `lama_strict_default_never_escalates_silently`：整图掩膜下 strict 默认拒绝（退出码 2、不产图、输入不变）；`--no-strict-classical` 后成功升级且记录升级原因。
+
+无 lama 环境的等价回归此前已在同套件跑通 26/26（两条路径分别验证）。套件版本 1.4。
+
+## 大面积水印 E2E 对照（合成素材，非真实样图）
+
+960×640 合成图，两处对角半透明 PREVIEW 文字（掩膜面积 5.7%），同一精确掩膜：
+
+- `--method auto`（strict，经典 exemplar→ns 回退）：水印移除，但圆形色块边缘出现拉毛与拖影——经典扩散/exemplar 复制对结构化边界的已知上限。
+- `--method lama`（CPU 推理）：水印移除，圆形边界与背景纹理延续自然，无可见拖影。
+
+对照图仅证明该合成案例的视觉差异；隐藏背景无真值，不能据此声称普遍画质优势。结论与既有限制一致：经典算法适合小掩膜与明确边界，LaMa 提升大面积/复杂背景的视觉上限，且结果属于估计，`needs_review=true` 与对照图检查不可省略。
+
+## 分发与可复核内容
+
+默认依赖不变（NumPy / Pillow / OpenCV）；LaMa 为可选显式启用，strict 默认不触碰。自测 26 项记录与上述 E2E 日志保存在机器验证产物中；`references/validation-results.json` 历史记录保留。
+
+---
+
 # 交付校验记录｜1.3.0
 
 日期：2026-10-07。本次继续修正实际使用暴露的字边残留、框选敏感性、初修误带入异材质及严格来源限制下覆盖失败。只使用 NumPy、Pillow、OpenCV；作者、MIT 许可、上架字段与以下全部历史记录保留。

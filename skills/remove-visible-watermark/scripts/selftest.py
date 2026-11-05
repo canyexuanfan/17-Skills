@@ -902,6 +902,90 @@ class Suite:
                       "scope": "One unlettered texture fixture; not a false-positive rate estimate."})
         return error
 
+    def lama_backend_case(self) -> dict:
+        """Explicit --method lama: real local deep repair when installed,
+        otherwise a clear opt-in error. The input is never modified."""
+        from lama_backend import availability
+        source = self.fixtures / "lama-source.png"
+        Image.fromarray(self.clean.astype(np.uint8)).save(source)
+        source_hash = digest(source)
+        mask = np.zeros(self.clean.shape[:2], dtype=np.uint8)
+        mask[40:104, 60:180] = 255
+        mask_path = self.fixtures / "lama-mask.png"
+        Image.fromarray(mask).save(mask_path)
+        output = self.outputs / "lama-out.png"
+        report_path = self.outputs / "lama-report.json"
+        info = availability()
+        if not info["available"]:
+            self.execute(["--input", source, "--output", output,
+                          "--profile", "none", "--mask", mask_path,
+                          "--method", "lama", "--report", report_path,
+                          "--no-preview"], expected=2)
+            error = self.error_report(report_path, ("simple-lama-inpainting", "pip"))
+            require(not output.exists(),
+                    "A missing optional backend still produced an image.")
+            require(digest(source) == source_hash, "The source changed.")
+            error.update({"backend_installed": False, "input_unchanged": True,
+                          "result_image_created": False})
+            return error
+        self.execute(["--input", source, "--output", output,
+                      "--profile", "none", "--mask", mask_path,
+                      "--method", "lama", "--no-preview"], expected=0)
+        report = self.read_report(sidecar(output, ".report.json"))
+        require(report.get("method") == "lama",
+                "Explicit lama repair did not report the lama method.")
+        require(report.get("lama_used") is True, "Report must set lama_used.")
+        require(report.get("strict_classical") is False,
+                "Deep repair must clear strict_classical.")
+        checked = self.assert_pixels(source, output, mask > 0, source_hash)
+        escalation = report.get("restoration", {}).get("lama") or {}
+        return {"backend_installed": True, "device": escalation.get("device"),
+                "method": report.get("method"), "lama_used": True,
+                "input_unchanged": checked["input_unchanged"]}
+
+    def lama_strict_default_never_escalates_silently(self) -> dict:
+        """A mask classical repair cannot supply: default strict-classical
+        reports a clear error; only --no-strict-classical may escalate."""
+        from lama_backend import availability
+        source = self.fixtures / "lama-escalation-source.png"
+        Image.fromarray(self.clean.astype(np.uint8)).save(source)
+        source_hash = digest(source)
+        mask = np.ones(self.clean.shape[:2], dtype=np.uint8) * 255
+        mask_path = self.fixtures / "lama-escalation-mask.png"
+        Image.fromarray(mask).save(mask_path)
+        info = availability()
+        strict_report = self.outputs / "lama-strict-error.json"
+        strict_output = self.outputs / "lama-strict-out.png"
+        self.execute(["--input", source, "--output", strict_output,
+                      "--profile", "none", "--mask", mask_path,
+                      "--method", "auto", "--report", strict_report,
+                      "--no-preview"], expected=2)
+        self.error_report(strict_report, ("mask is too large",))
+        require(not strict_output.exists(),
+                "Strict auto produced an image without usable classical support.")
+        require(digest(source) == source_hash, "The strict source changed.")
+        result = {"backend_installed": info["available"],
+                  "strict_default_rejected": True, "input_unchanged": True}
+        if not info["available"]:
+            result["escalation_skipped"] = "backend_not_installed"
+            return result
+        open_output = self.outputs / "lama-open-out.png"
+        open_report = self.outputs / "lama-open-report.json"
+        self.execute(["--input", source, "--output", open_output,
+                      "--profile", "none", "--mask", mask_path,
+                      "--method", "auto", "--no-strict-classical",
+                      "--no-preview"], expected=0)
+        report = self.read_report(sidecar(open_output, ".report.json"))
+        require(report.get("method") == "lama",
+                "Opted-in escalation did not report the lama method.")
+        require(report.get("lama_used") is True,
+                "Escalation must set lama_used.")
+        reason = (report.get("restoration", {}).get("lama") or {}).get(
+            "escalation_reason", "")
+        require(bool(reason), "Escalation must record its reason.")
+        result.update({"escalated": True, "escalation_reason_recorded": True})
+        return result
+
     def run_case(self, case_id: str, function) -> None:
         self.last_call = None
         started = time.monotonic()
@@ -943,6 +1027,8 @@ class Suite:
             ("explicit_source_exclusion_preserves_selection_and_blocks_donor_influence", self.explicit_source_exclusion),
             ("invalid_text_roi_and_quality_have_clear_errors", self.invalid_text_parameters),
             ("unlettered_text_roi_is_not_rectangularly_erased", self.no_text_roi_is_not_erased),
+            ("lama_explicit_backend_or_clear_opt_in_error", self.lama_backend_case),
+            ("lama_strict_default_never_escalates_silently", self.lama_strict_default_never_escalates_silently),
         ]
         for case_id, function in cases:
             self.run_case(case_id, function)
@@ -973,7 +1059,7 @@ def main() -> int:
         target = None
     started = time.monotonic()
     result = {
-        "suite_version": "1.3",
+        "suite_version": "1.4",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "scope": "Offline synthetic regression and CLI boundary checks; not a general image-quality benchmark.",
         "artifacts_retained": bool(target),

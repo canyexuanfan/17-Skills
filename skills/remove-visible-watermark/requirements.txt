@@ -1,3 +1,8 @@
 numpy>=1.24,<3
 Pillow>=10.4,<13
 opencv-python-headless==4.11.0.86
+
+# Optional local deep-repair backend (big-lama), never installed by default:
+#   PYTHON -m pip install simple-lama-inpainting
+# Pulls in PyTorch; the open-source big-lama weights load from local storage
+# and inference is fully offline. Classical methods remain the default path.

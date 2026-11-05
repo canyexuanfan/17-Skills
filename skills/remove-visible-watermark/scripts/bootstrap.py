@@ -12,7 +12,7 @@ import venv
 
 SKILL_ROOT=Path(__file__).resolve().parents[1]
 REQUIREMENTS=SKILL_ROOT/'requirements.txt'
-PROBE='import json,sys,numpy,PIL,cv2; print(json.dumps({"python":sys.executable,"numpy":numpy.__version__,"Pillow":PIL.__version__,"OpenCV":cv2.__version__}))'
+PROBE='import json,sys,numpy,PIL,cv2;\ntry:\n import simple_lama_inpainting as _sl; import torch as _t; _lama="cuda" if _t.cuda.is_available() else "cpu"\nexcept Exception:\n _lama=None\nprint(json.dumps({"python":sys.executable,"numpy":numpy.__version__,"Pillow":PIL.__version__,"OpenCV":cv2.__version__,"lama":_lama}))'
 
 
 def probe(python):

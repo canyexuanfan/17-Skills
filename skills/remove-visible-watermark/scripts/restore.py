@@ -1,20 +1,26 @@
-"""Bounded classical restoration; no models, network, or implicit image resizing.
+"""Bounded restoration: classical algorithms by default, optional local deep repair.
 
 ``mask`` is the caller's final permission-to-write mask, after protection masks
 have been subtracted. Every algorithm computes in a crop, and the final copy is
 restricted to that mask. Returned ``actual_write_mask`` marks changed pixels.
 
-These algorithms estimate hidden content. Diagnostics are engineering checks,
-not reference-free proof that the original background has been recovered.
+The classical methods estimate hidden content without model weights. The
+optional ``lama`` backend runs the open-source big-lama weights locally and
+offline; it is used only on explicit request or, when ``strict_classical`` is
+disabled, as a recorded escalation after a classical budget failure. All
+diagnostics are engineering checks, not reference-free proof that the original
+background has been recovered.
 """
 from __future__ import annotations
 
 import math
+import time
 from typing import Any
 
 import cv2
 import numpy as np
 from patch_inpaint import patch_inpaint
+import lama_backend
 
 
 MAX_ROI_PIXELS = 4_000_000
@@ -312,15 +318,49 @@ def _inpaint(rgb, mask, excluded, method, radius, full_pixels, diagnostics):
     return best
 
 
+def _budget_failure(message: str) -> bool:
+    """True for failures a stronger backend could plausibly resolve."""
+    tokens = ("budget", "too large", "too little reliable context",
+              "no intact source patch", "no intact donor",
+              "occlusion wider", "exhausted its fixed iteration budget",
+              "lacks clean context", "insufficient clean neighboring")
+    return any(token in message for token in tokens)
+
+
+def _lama_crop(local_rgb, active, excluded, diagnostics, *, reason):
+    """Run big-lama on the crop; write nothing outside ``active``."""
+    started = time.perf_counter()
+    candidate = lama_backend.inpaint(local_rgb, excluded)
+    evaluated = local_rgb.copy()
+    evaluated[active] = candidate[active]
+    diagnostics.update(
+        method="lama",
+        restoration_kind="generative_local_inpainting_biglama",
+        needs_review=True,
+        lama={**lama_backend.availability(), "escalation_reason": reason,
+              "seconds": round(time.perf_counter() - started, 3)})
+    diagnostics["assumptions"].append(
+        "big-lama synthesizes a plausible continuation of texture and "
+        "structure; the hidden background remains an estimate.")
+    diagnostics["warnings"].append(
+        "Deep inpainting can invent plausible but incorrect detail; inspect "
+        "the comparison image before accepting the result.")
+    return evaluated
+
+
 def restore(rgb_uint8, mask_bool, *, method="auto", detection=None, radius=3.0,
-            source_exclusion=None, quality="balanced", refinement="none"):
+            source_exclusion=None, quality="balanced", refinement="none",
+            allow_lama_escalation=False):
     """Return ``(RGB uint8 image, changed-pixel bool mask, JSON-safe diagnostics)``.
 
-    Methods: auto, inverse, fill (near-constant background), exemplar, telea, ns.
+    Methods: auto, inverse, fill, exemplar, telea, ns, lama.
     Invalid geometry, unsupported evidence or numerical instability raises
     ValueError before an output is returned; inputs are never modified.
     ``detection`` uses bbox [x0,y0,x1,y1] with exclusive upper bounds and local
     float alpha / bool write_mask arrays. Only encoded_rgb inversion is enabled.
+    ``lama`` runs the optional local big-lama backend. With
+    ``allow_lama_escalation`` the ``auto`` path may escalate to it after a
+    classical budget failure; the escalation and its reason are recorded.
     """
     rgb = np.asarray(rgb_uint8)
     mask = np.asarray(mask_bool)
@@ -328,8 +368,8 @@ def restore(rgb_uint8, mask_bool, *, method="auto", detection=None, radius=3.0,
         raise ValueError("rgb_uint8 must be a nonempty H x W x 3 uint8 RGB array.")
     if mask.dtype != np.bool_ or mask.shape != rgb.shape[:2]:
         raise ValueError("mask_bool must be a boolean array matching the image height and width.")
-    if method not in {"auto", "inverse", "fill", "exemplar", "telea", "ns"}:
-        raise ValueError("method must be one of auto, inverse, fill, exemplar, telea, ns.")
+    if method not in {"auto", "inverse", "fill", "exemplar", "telea", "ns", "lama"}:
+        raise ValueError("method must be one of auto, inverse, fill, exemplar, telea, ns, lama.")
     if quality not in {"fast", "balanced", "high"}:
         raise ValueError("quality must be fast, balanced or high.")
     if refinement not in {"none", "consensus"}:
@@ -363,7 +403,7 @@ def restore(rgb_uint8, mask_bool, *, method="auto", detection=None, radius=3.0,
         # Preserve the original small context for calibrated profiles. Unknown
         # masks need a wider material neighborhood for intact-patch search.
         padding=max(9, int(math.ceil(radius * 3)))
-        if method=="exemplar" or (method=="auto" and template is None):
+        if method in {"exemplar", "lama"} or (method=="auto" and template is None):
             padding={"fast":89,"balanced":123,"high":159}[quality]
         if refinement=="consensus":
             padding=max(padding,131)
@@ -382,6 +422,9 @@ def restore(rgb_uint8, mask_bool, *, method="auto", detection=None, radius=3.0,
         elif method == "auto" and template is not None:
             diagnostics["method"] = "inverse"
             candidate, active, roi = _inverse(rgb, mask, template, diagnostics)
+        elif method == "lama":
+            candidate = _lama_crop(local_rgb, active, excluded, diagnostics,
+                                   reason="explicit_method")
         elif method in {"auto", "exemplar"}:
             try:
                 candidate, patch_diag=patch_inpaint(local_rgb, active, source_exclusion=excluded, quality=quality)
@@ -394,8 +437,25 @@ def restore(rgb_uint8, mask_bool, *, method="auto", detection=None, radius=3.0,
                 if method=="exemplar":
                     raise
                 diagnostics["exemplar_unavailable_reason"]=str(exc)
-                diagnostics["warnings"].append("Exemplar exceeded its bounded support or budget; using approximate Navier-Stokes fallback.")
-                candidate=_inpaint(local_rgb,active,excluded,"ns",radius,mask.size,diagnostics)
+                lama_info = lama_backend.availability()
+                if (allow_lama_escalation and _budget_failure(str(exc))
+                        and lama_info["available"]):
+                    diagnostics["warnings"].append(
+                        "Bounded classical repair could not supply this mask; "
+                        "escalating to the local open-source big-lama backend.")
+                    candidate=_lama_crop(local_rgb,active,excluded,diagnostics,
+                                         reason="exemplar_failure: "+str(exc))
+                else:
+                    diagnostics["warnings"].append("Exemplar exceeded its bounded support or budget; using approximate Navier-Stokes fallback.")
+                    try:
+                        candidate=_inpaint(local_rgb,active,excluded,"ns",radius,mask.size,diagnostics)
+                    except ValueError as ns_exc:
+                        if (allow_lama_escalation and _budget_failure(str(ns_exc))
+                                and lama_info["available"]):
+                            candidate=_lama_crop(local_rgb,active,excluded,diagnostics,
+                                                 reason="ns_fallback_failure: "+str(ns_exc))
+                        else:
+                            raise
         else:
             candidate = _inpaint(local_rgb, active, excluded, method, radius, mask.size, diagnostics)
         if refinement=="consensus":

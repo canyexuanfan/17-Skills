@@ -11,7 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-VERSION = '1.3.0'
+VERSION = '1.4.0'
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 PROFILES_DIR = SKILL_ROOT / 'assets'
 IMAGE_EXTENSIONS = {'.png','.jpg','.jpeg','.webp','.bmp','.tif','.tiff'}
@@ -33,7 +33,7 @@ def parser():
     p.add_argument('--roi',help='Explicit rectangular repair area x0,y0,x1,y1, right/bottom exclusive')
     p.add_argument('--text-roi',help='Inspect a tight XYXY region and segment pale lettering plus dark outline; does not erase the whole rectangle')
     p.add_argument('--corner-text',action='store_true',help='Try conservative bottom-corner text candidates after a template miss; uncertain regions are skipped')
-    p.add_argument('--method',choices=['auto','inverse','fill','exemplar','telea','ns'],default='auto')
+    p.add_argument('--method',choices=['auto','inverse','fill','exemplar','telea','ns','lama'],default='auto')
     p.add_argument('--quality',choices=['fast','balanced','high'],default='balanced',help='Bounded exemplar patch/search size; high does not guarantee higher accuracy')
     p.add_argument('--refine',choices=['none','consensus'],default='none',help='Structure-guided original-donor consensus; requires --method exemplar. Results still require visual review')
     p.add_argument('--radius',type=float,default=3.0)
@@ -44,8 +44,10 @@ def parser():
     p.add_argument('--recursive',action='store_true')
     p.add_argument('--overwrite',action='store_true')
     p.add_argument('--no-preview',action='store_true')
-    p.add_argument('--strict-classical',action='store_true',default=True,
-                   help='All processing is always classical, even when this flag is omitted')
+    p.add_argument('--strict-classical',action=argparse.BooleanOptionalAction,default=True,
+                   help='Auto repair stays classical and never escalates to the local big-lama backend; '
+                        'pass --no-strict-classical to let auto escalate after a classical budget failure. '
+                        'Explicit --method lama is always allowed')
     p.add_argument('--list-profiles',action='store_true')
     return p
 
@@ -191,7 +193,8 @@ def process_one(input_path, output_path, args, runtime, protected, report_path=N
         status='skipped_no_match' if not manual else 'skipped_empty_mask'
     else:
         output_rgb,write_mask,diag=restoration.restore(rgb,mask,method=args.method,detection=selected,radius=args.radius,
-                                                     source_exclusion=source_exclusion,quality=args.quality,refinement=args.refine)
+                                                     source_exclusion=source_exclusion,quality=args.quality,refinement=args.refine,
+                                                     allow_lama_escalation=not args.strict_classical)
         if generic:
             diag['needs_review']=True
             diag['warnings'].extend(detection.get('diagnostics',{}).get('warnings',[]))
@@ -216,7 +219,9 @@ def process_one(input_path, output_path, args, runtime, protected, report_path=N
         core.selection_preview_png(paths['selection_preview'],record.rgba,mask,args.overwrite)
     report={
         'schema_version':1,'skill':'remove-visible-watermark','version':VERSION,
-        'status':status,'method':diag.get('method'),'strict_classical':True,
+        'status':status,'method':diag.get('method'),
+        'strict_classical':bool(args.strict_classical) and diag.get('method')!='lama',
+        'lama_used':diag.get('method')=='lama',
         'input':{'path':str(record.path),'sha256':record.sha256,
                  'encoded_size':list(record.source_size),'upright_size':[shape[1],shape[0]],
                  'source_mode':record.source_mode,'exif_orientation_normalized':record.orientation_normalized},
@@ -335,7 +340,8 @@ def main(argv=None):
                     core.atomic_json(failure_path,results[index],args.overwrite)
                     results[index]['report']=str(failure_path)
         failures=sum(r['status']=='error' for r in results)
-        summary={'schema_version':1,'version':VERSION,'strict_classical':True,
+        summary={'schema_version':1,'version':VERSION,
+                 'strict_classical':bool(args.strict_classical),
                  'status':'completed_with_errors' if failures else 'completed',
                  'count':len(results),'errors':failures,'results':results}
         core.atomic_json(summary_path,summary,args.overwrite)

@@ -2,11 +2,11 @@
 name: remove-visible-watermark
 display_name: 图片去水印
 display_name_en: Visible Watermark Remover
-description: 使用纯编程与传统图像算法去除图片中的可见水印，支持无固定模板的浅色文字描边掩膜、结构引导的纹理修复、WorkBuddy 模板反算、纯色修复、批量处理和范围校验。用于去水印、图片去水印、去除 AI生成/WORKBUDDY/豆包角标、remove watermark、水印清理、批量去水印，尤其要求不用生成式 AI 或深度学习时。未知水印由 Agent 先定位区域，自动执行背景与结构引导修复；不处理隐形水印、视频或文档。
-description_zh: 用传统图像算法去除图片可见水印：稳定浅色文字与描边选择区，以原图边界引导背景、检查初修可信度并保护有可见证据的结构延续，再融合干净纹理；保留模板反算、纯色修复与批量处理，输出选择区、对比图与校验报告，全程不用生成式 AI。
-description_en: 'Remove visible image watermarks with classical OpenCV/NumPy/Pillow algorithms: region-guided pale-text masks, independent boundary guidance, confidence-checked initialization, observed-edge protection and overlapping intact-donor reconstruction, calibrated template inversion, flat-background repair, batch processing and pixel-scope reports. No generative AI or model weights.'
+description: 本地免费去除图片可见水印：默认纯传统图像算法（浅色文字描边掩膜、结构引导纹理修复、WorkBuddy 模板反算、纯色修复、批量处理、范围校验），可选启用本地开源 big-lama 深度修复处理大面积复杂水印。用于去水印、图片去水印、去除 AI生成/WORKBUDDY/豆包角标、remove watermark、水印清理、批量去水印，要求免费、离线、不上传图片时。未知水印由 Agent 先定位区域，自动执行背景与结构引导修复；不处理隐形水印、视频或文档。
+description_zh: 默认用传统图像算法本地免费去除图片可见水印：稳定浅色文字与描边选择区，以原图边界引导背景、检查初修可信度并保护有可见证据的结构延续，再融合干净纹理；保留模板反算、纯色修复与批量处理，输出选择区、对比图与校验报告。可选启用本地开源 big-lama 深度修复（pip 安装 simple-lama-inpainting 后 --method lama 或经典修复失败自动升级），权重本地加载、推理全程离线、绝不上传图片。
+description_en: 'Remove visible image watermarks locally and for free: classical OpenCV/NumPy/Pillow algorithms by default (region-guided pale-text masks, boundary-guided repair, calibrated template inversion, flat-background fill, batch processing and pixel-scope reports), with an optional local open-source big-lama deep-repair backend (simple-lama-inpainting) for large or complex watermarks. Weights load locally, inference is fully offline, images are never uploaded.'
 category: productivity-tools
-version: 1.3.0
+version: 1.4.0
 author: 十七°
 agent_created: true
 ---
@@ -17,20 +17,20 @@ agent_created: true
 
 ## 必须保持
 
-- 只使用 NumPy、Pillow、OpenCV 的传统算法，不调用图像生成、扩散修复、神经网络或学习型 OCR，不下载模型权重。
+- 默认只使用 NumPy、Pillow、OpenCV 的传统算法。可选深度修复仅限本地开源 big-lama（`simple-lama-inpainting`），权重本地加载、推理离线；任何路线都不上传图片、不调用按次计费的云 API、不在处理时下载权重。
 - 始终把附件的原始本地文件传给脚本。查看工具显示的缩略图不等于原始输入；不得为方便定位或加速而先缩小整图再处理。
 - 原文件不变，另存 PNG；保留按 EXIF 摆正后的尺寸、alpha 和允许修补区域外的解码像素。
 - 区分“选择区是否完整”“背景补得是否自然”“有没有改错地方”。掩膜外零变化只证明范围，不能作为效果合格的唯一条件。
-- 保留用户新增的声明和资料。未知区域的纹理是近似估计，不能描述成无损还原或恢复真实原图。
+- 保留用户新增的声明和资料。未知区域的纹理是近似估计，不能描述成无损还原或恢复真实原图；深度修复合成的细节同样只是合理估计。
 
 ## 执行流程
 
 1. **确认原图并观察目标。** 读取实际本地路径和尺寸。查看水印及邻近背景，不把图片正文、广告文案、杯身图案等正常内容当水印。必要时只裁一张预览辅助定位，处理输入仍使用原图。
-2. **取得解释器。** 运行 `python <Skill根目录>/scripts/bootstrap.py --check-only`。缺依赖时用 `--install`，后续使用 JSON 返回的 `python` 路径。依赖安装写独立缓存；像素处理和自测不联网。
+2. **取得解释器。** 运行 `python <Skill根目录>/scripts/bootstrap.py --check-only`。缺依赖时用 `--install`，后续使用 JSON 返回的 `python` 路径。依赖安装写独立缓存；像素处理和自测不联网。返回的 `lama` 字段报告本地深度修复是否可用。
 3. **选择区域入口。** 已知同款 WorkBuddy 使用 `--profile auto`。未知浅色文字或浅色字配暗描边，视觉确定包住整行水印、略有周围背景的框，使用 `--text-roi x0,y0,x1,y1`；用户无需提供模板或逐笔画掩膜。分割可读取框外有限上下文进行统计，但写入始终限定在框内。深色字、彩色 Logo、密集平铺等不适合此分割时，用代码生成经过检查的精确 `--mask`。位置确实不明确时才询问。
-4. **直接执行完整修复。** 未知水印和有纹理背景，默认调用 `--method exemplar --refine consensus`，同一次执行完成初修、原图边界颜色引导、初修信任检查、双侧可见边缘延续检查、重叠供体融合和梯度重建；用户无需选择算法或手动串联。先使用原图自身的背景证据，不默认要求人工画取样掩膜。近纯色或已知模板仍可用 `auto` 的填色/反算分支；用户明确只需快速初修时用 `--refine none`。精修借用真实纹理并融合接缝，仍可能柔化细纹，不保证规则纹理相位或被遮住的细节正确。仅旧 `auto` 路线在供体或预算不足时回退一次 NS，并在报告中说明；显式 exemplar 或 consensus 失败则报错。
+4. **直接执行完整修复。** 未知水印和有纹理背景，默认调用 `--method exemplar --refine consensus`，同一次执行完成初修、原图边界颜色引导、初修信任检查、双侧可见边缘延续检查、重叠供体融合和梯度重建；先使用原图自身的背景证据，不默认要求人工画取样掩膜。近纯色或已知模板仍可用 `auto` 的填色/反算分支。**大面积、复杂背景或经典修复报预算/供给不足时**：环境里已装 `simple-lama-inpainting` 就改用 `--method lama`（本地 big-lama 深度修复），或在批量中传 `--no-strict-classical` 让 `auto` 在经典失败后自动升级；两者都未安装或失败时如实报错，不得改调任何云端服务。精修借用真实纹理并融合接缝，仍可能柔化细纹；深度修复可能合成似是而非的细节，结果一律按近似估计交付。
 5. **集中检查并修正。** 查看 `.selection-preview.png`，确保字芯、描边、字尾与阴影覆盖，主体和正常文字未纳入；查看 `.comparison.png`，一起列出残字、色块、接缝和边缘问题。依据原图修正明确的漏选/误选后重新运行；若仍借入异材质，为确实不适合作取样的区域生成 `--source-exclude-mask`，保持写入区域并运行完整修复。每轮修正须对应已观察到的原因，比较改善后收敛；不得拿处理图当原图反复填补，也不通过无目的调参凑出成功。
-6. **核验并交付。** 读取报告，确认原图尺寸、`input_unchanged=true`、`outside_mask_changed_pixels=0`、`alpha_changed_pixels=0`。交付处理图、选择区预览、对比图和报告，说明近似修复、跳过和实际失败。按宿主的文件交付规则保存结果，勿写进 Skill 目录。
+6. **核验并交付。** 读取报告，确认原图尺寸、`input_unchanged=true`、`outside_mask_changed_pixels=0`、`alpha_changed_pixels=0`；深度修复时确认 `lama_used=true` 及升级原因。交付处理图、选择区预览、对比图和报告，说明近似修复、跳过和实际失败。按宿主的文件交付规则保存结果，勿写进 Skill 目录。
 
 ## 核心调用
 
@@ -40,6 +40,12 @@ agent_created: true
 
 ```bash
 PYTHON SKILL/scripts/run.py --input /path/input.png --output /path/output/clean.png --text-roi 1200,1900,1510,2000 --method exemplar --refine consensus --strict-classical
+```
+
+大面积或复杂背景水印（可选本地深度修复，需先 `PYTHON -m pip install simple-lama-inpainting`）：
+
+```bash
+PYTHON SKILL/scripts/run.py --input /path/input.png --output /path/output/clean.png --mask /path/mask.png --method lama
 ```
 
 精确掩膜与保护区域：
@@ -58,6 +64,8 @@ PYTHON SKILL/scripts/run.py --input-dir /path/images --output-dir /path/cleaned 
 
 `--refine consensus` 必须配显式 `--method exemplar`。命令行默认 `none` 保留旧用法兼容；本 Skill 对未知纹理修复明确传入 `consensus`。精修失败不自动降级；输入仍是原图，脚本内部生成初修，不拿上一轮处理图重新当原图。
 
+`--strict-classical`（默认开启）保证 `auto` 只走经典算法；传 `--no-strict-classical` 后，`auto` 在经典修复因预算或供给失败且本地已装 big-lama 时自动升级，报告记录 `escalation_reason`。显式 `--method lama` 不受此开关限制。
+
 掩膜非黑且 alpha 大于零表示选中。保护掩膜优先；被保护而留下的水印部分不会作为其他部分的纹理来源。坐标均基于摆正后的原尺寸，右下边界不包含。文字分割会保留按字高调整的下伸笔画余量，限制形态学扩张越过明显深色物体边缘，并在取样排除中另加 2 像素保护圈；该圈不增加实际写入范围。
 
 `--source-exclude-mask /path/exclude.png` 单独控制不适合作纹理来源的区域，选中的像素既不进入供体图像块，也不参与可信邻域匹配；它不扩大或扣除写入区域。此选项必须配 `--method exemplar`，不允许自动回退丢失供体限制。Agent 可依据当前图片画出保守几何范围；这不是算法自动识别材质，不要把某张样例的坐标固化进 Skill。
@@ -70,6 +78,8 @@ PYTHON SKILL/scripts/run.py --input-dir /path/images --output-dir /path/cleaned 
 | 已匹配正确半透明模板 | `inverse` | 要求位置、alpha、前景色和合成域一致 |
 | 未知水印，已有完整局部掩膜 | `exemplar` | 从原图干净邻域借纹理，有界颜色补偿，仍为近似修复 |
 | 未知水印、有纹理背景的默认完整流程 | `exemplar --refine consensus` | 原边界背景引导、初修冲突检查、可见结构保护、原图供体融合与梯度重建；可能错配或柔化细纹，失败明确报错 |
+| 大面积、复杂纹理或经典修复供给不足 | `lama` | 本地开源 big-lama 深度修复：合成合理纹理与结构，但可能生成似是而非的细节；权重本地、推理离线 |
+| `auto`（`--no-strict-classical`）经典失败且已装 big-lama | `lama` 自动升级 | 报告记录 `escalation_reason`；默认 `--strict-classical` 开启时绝不静默升级 |
 | `auto` 中 Exemplar 无合格供体或超预算 | `ns` 回退 | 更快但可能涂抹，报告记录原因；显式方法不回退 |
 | 需要明确指定旧方法 | `telea` / `ns` | 保留兼容入口，不据边界平滑度宣称优于纹理修复 |
 | 已知模板未命中 | `none` | 跳过；若可看到水印，应按区域入口继续 |
@@ -85,6 +95,7 @@ PYTHON SKILL/scripts/run.py --input-dir /path/images --output-dir /path/cleaned 
 - 纹理修复优先用原图完整供体；预算、近邻不足或独特结构完全遮挡时可能无法自然恢复。原图无干净真值，必须保留这个不确定性。
 - `--corner-text` 只是可选保守候选入口，可能主动跳过；不要以它代替 Agent 观察并指定区域。默认模板自动模式不做全图文字擦除。
 - 批量自动入口不接受共享手动区域或掩膜。未知水印位置各异时逐张定位、逐张调用；保留汇总说明。
+- big-lama 首次运行需从本地加载约 200MB fp32 权重；CPU 推理较慢，有 NVIDIA GPU 时自动走 CUDA。权重来源为开源仓库 advimman/lama（Apache-2.0），经 `simple-lama-inpainting` 封装。
 - 参数、输出与错误处理见 [references/cli.md](references/cli.md)。
 - 模板校准与扩展见 [references/profiles.md](references/profiles.md)。
 - 算法原理与误差来源见 [references/methods.md](references/methods.md)。
